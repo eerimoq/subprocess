@@ -1,0 +1,1 @@
+-Wl,--wrap=close -Wl,--wrap=fork -Wl,--wrap=pipe

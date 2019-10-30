@@ -53,4 +53,6 @@ dkms.conf
 examples/main
 *.gcda
 *.gcno
-tst/main
+tst/normal/main
+tst/mocked/main
+tst/mocked/__mocks__.pp.c

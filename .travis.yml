@@ -1,5 +1,8 @@
 language: c
 
+install:
+  - pip3 install narmock
+
 script:
   - make test
 
