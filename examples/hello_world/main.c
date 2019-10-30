@@ -14,14 +14,12 @@ int main()
 
     result_p = subprocess_call(hello, "World");
 
-    if (result_p == NULL) {
-        printf("Call failed!\n");
-
-        return (1);
+    if (result_p != NULL) {
+        subprocess_result_print(result_p);
+        subprocess_result_free(result_p);
+    } else {
+        printf("hello() never called.\n");
     }
-
-    subprocess_result_print(result_p);
-    subprocess_result_free(result_p);
 
     return (0);
 }
