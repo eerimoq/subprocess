@@ -52,9 +52,9 @@ TEST(test_call_no_output)
 
     ASSERT_EQ(output,
               "exit_code: 0\n"
-              "stdout:\n"
+              "stdout (length: 0):\n"
               "\n"
-              "stderr:\n"
+              "stderr (length: 0):\n"
               "\n");
 }
 
@@ -81,9 +81,9 @@ TEST(test_call_stdout)
 
     ASSERT_EQ(output,
               "exit_code: 0\n"
-              "stdout:\n"
+              "stdout (length: 6):\n"
               "Hello!\n"
-              "stderr:\n"
+              "stderr (length: 0):\n"
               "\n");
 }
 
@@ -110,9 +110,9 @@ TEST(test_call_stderr)
 
     ASSERT_EQ(output,
               "exit_code: 0\n"
-              "stdout:\n"
+              "stdout (length: 0):\n"
               "\n"
-              "stderr:\n"
+              "stderr (length: 6):\n"
               "Hello!\n");
 }
 
@@ -136,9 +136,9 @@ TEST(test_call_exit)
 
     ASSERT_EQ(output,
               "exit_code: 1\n"
-              "stdout:\n"
+              "stdout (length: 6):\n"
               "Hello!\n"
-              "stderr:\n"
+              "stderr (length: 0):\n"
               "\n");
 }
 

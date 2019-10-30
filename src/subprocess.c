@@ -41,6 +41,13 @@ static void output_init(struct subprocess_output_t *self_p)
     self_p->buf_p[0] = '\0';
 }
 
+static void output_print(struct subprocess_output_t *self_p,
+                         const char *name_p)
+{
+    printf("%s (length: %ld):\n", name_p, self_p->length);
+    printf("%s\n", self_p->buf_p);
+}
+
 static struct subprocess_result_t *result_new(void)
 {
     struct subprocess_result_t *result_p;
@@ -177,10 +184,8 @@ struct subprocess_result_t *subprocess_call(subprocess_entry_t entry,
 void subprocess_result_print(struct subprocess_result_t *self_p)
 {
     printf("exit_code: %d\n", self_p->exit_code);
-    printf("stdout:\n");
-    printf("%s\n", self_p->stdout.buf_p);
-    printf("stderr:\n");
-    printf("%s\n", self_p->stderr.buf_p);
+    output_print(&self_p->stdout, "stdout");
+    output_print(&self_p->stderr, "stderr");
 }
 
 void subprocess_result_free(struct subprocess_result_t *self_p)
