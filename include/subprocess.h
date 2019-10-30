@@ -45,8 +45,8 @@ struct subprocess_result_t {
 };
 
 /**
- * Call given function with given argument in a subprocess. Captures
- * subprocess' stdout and stderr.
+ * Call given function with given argument in a subprocess. Retruns
+ * captured subprocess' stdout, stderr and exit code.
  *
  * Returns NULL if the subprocess could not be started.
  */
@@ -54,7 +54,7 @@ struct subprocess_result_t *subprocess_call(subprocess_entry_t entry,
                                             void *arg_p);
 
 /**
- * Print function result, stdout and stderr to standard output.
+ * Print subprocess exit code, stdout and stderr.
  */
 void subprocess_result_print(struct subprocess_result_t *self_p);
 
