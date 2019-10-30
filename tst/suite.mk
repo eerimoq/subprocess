@@ -7,7 +7,7 @@ SRC += \
 	main.c
 CFLAGS += \
 	-Werror \
-	-O3 \
+	-O0 \
 	-g \
 	-Wall \
 	-fprofile-arcs \

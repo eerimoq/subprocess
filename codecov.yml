@@ -1,4 +1,4 @@
 ignore:
   - "tst/*/main.c"
   - "tst/*/__mocks__.c"
-  - "tst/narmock.c"
+  - "tst/narwhal.c"
