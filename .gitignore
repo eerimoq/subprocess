@@ -50,7 +50,7 @@ modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
-examples/main
+examples/*/main
 *.gcda
 *.gcno
 tst/normal/main

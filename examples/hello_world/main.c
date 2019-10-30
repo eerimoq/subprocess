@@ -2,12 +2,10 @@
 #include <unistd.h>
 #include "subprocess.h"
 
-static int hello(void *arg_p)
+static void hello(void *arg_p)
 {
     printf("Hello %s on stdout!\n", (char *)arg_p);
     fprintf(stderr, "Hello %s on stderr!\n", (char *)arg_p);
-
-    return (0);
 }
 
 int main()
@@ -18,6 +16,7 @@ int main()
 
     if (result_p == NULL) {
         printf("Call failed!\n");
+
         return (1);
     }
 
