@@ -1,7 +1,7 @@
 language: python
 
 install:
-  - pip3 install narmock
+  - pip install narmock
 
 script:
   - make test
