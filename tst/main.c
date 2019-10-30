@@ -39,6 +39,7 @@ TEST(test_call_no_output)
     struct subprocess_result_t *result_p;
 
     result_p = subprocess_call(call_no_output, NULL);
+
     ASSERT_EQ(result_p->exit_code, 0);
     ASSERT_EQ(result_p->stdout.length, 0);
     ASSERT_EQ(result_p->stderr.length, 0);
@@ -67,6 +68,7 @@ TEST(test_call_stdout)
     struct subprocess_result_t *result_p;
 
     result_p = subprocess_call((subprocess_entry_t)call_stdout, "Hello!");
+
     ASSERT_EQ(result_p->exit_code, 0);
     ASSERT_EQ(result_p->stdout.length, 6);
     ASSERT_EQ(result_p->stderr.length, 0);
@@ -95,6 +97,7 @@ TEST(test_call_stderr)
     struct subprocess_result_t *result_p;
 
     result_p = subprocess_call((subprocess_entry_t)call_stderr, "Hello!");
+
     ASSERT_EQ(result_p->exit_code, 0);
     ASSERT_EQ(result_p->stdout.length, 0);
     ASSERT_EQ(result_p->stderr.length, 6);
@@ -139,12 +142,45 @@ TEST(test_call_exit)
               "\n");
 }
 
+static void call_long_output(void *arg_p)
+{
+    int i;
+
+    for (i = 0; i < 2000; i++) {
+        printf("123");
+        fprintf(stderr, "456");
+    }
+}
+
+TEST(test_call_long_output)
+{
+    int i;
+    struct subprocess_result_t *result_p;
+
+    result_p = subprocess_call(call_long_output, NULL);
+
+    ASSERT_EQ(result_p->stdout.length, 6000);
+    ASSERT_EQ(result_p->stderr.length, 6000);
+
+    for (i = 0; i < 2000; i++) {
+        ASSERT_EQ(result_p->stdout.buf_p[3 * i + 0], '1');
+        ASSERT_EQ(result_p->stdout.buf_p[3 * i + 1], '2');
+        ASSERT_EQ(result_p->stdout.buf_p[3 * i + 2], '3');
+        ASSERT_EQ(result_p->stderr.buf_p[3 * i + 0], '4');
+        ASSERT_EQ(result_p->stderr.buf_p[3 * i + 1], '5');
+        ASSERT_EQ(result_p->stderr.buf_p[3 * i + 2], '6');
+    }
+
+    subprocess_result_free(result_p);
+}
+
 int main()
 {
     return RUN_TESTS(
         test_call_no_output,
         test_call_stdout,
         test_call_stderr,
-        test_call_exit
+        test_call_exit,
+        test_call_long_output
     );
 }
