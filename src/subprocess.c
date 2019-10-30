@@ -26,7 +26,6 @@
  * This file is part of the subprocess project.
  */
 
-#include <dbg.h>
 #include <unistd.h>
 #include <errno.h>
 #include <stdio.h>
