@@ -160,6 +160,15 @@ struct subprocess_result_t *subprocess_call(subprocess_entry_t entry,
     return (NULL);
 }
 
+void subprocess_result_print(struct subprocess_result_t *self_p)
+{
+    printf("res: %d\n", self_p->res);
+    printf("stdout:\n");
+    printf("%s", self_p->stdout.buf_p);
+    printf("stderr:\n");
+    printf("%s", self_p->stderr.buf_p);
+}
+
 void subprocess_result_free(struct subprocess_result_t *self_p)
 {
     free(self_p->stdout.buf_p);

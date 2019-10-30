@@ -24,4 +24,12 @@ struct subprocess_result_t {
 struct subprocess_result_t *subprocess_call(subprocess_entry_t entry,
                                             void *arg_p);
 
+/**
+ * Print function result, stdout and stderr to standard output.
+ */
+void subprocess_result_print(struct subprocess_result_t *self_p);
+
+/**
+ * Free given result.
+ */
 void subprocess_result_free(struct subprocess_result_t *self_p);
