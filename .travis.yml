@@ -1,4 +1,4 @@
-language: c
+language: python
 
 install:
   - pip3 install narmock
