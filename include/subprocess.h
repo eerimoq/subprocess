@@ -35,7 +35,7 @@ typedef void (*subprocess_entry_t)(void *arg_p);
 struct subprocess_output_t {
     /* Always null-terminated. */
     char *buf_p;
-    /* Buffer length, without null-termination. */
+    /* Buffer length, not incuding last null-termination. */
     size_t length;
     size_t size;
 };
