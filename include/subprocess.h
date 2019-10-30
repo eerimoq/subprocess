@@ -28,6 +28,8 @@
 
 #include <string.h>
 
+#define SUBPROCESS_VERSION "0.1.0"
+
 typedef void (*subprocess_entry_t)(void *arg_p);
 
 struct subprocess_output_t {
