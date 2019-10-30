@@ -10,6 +10,7 @@ static void output_init(struct subprocess_output_t *self_p)
     self_p->length = 0;
     self_p->size = 4096;
     self_p->buf_p = malloc(self_p->size);
+    self_p->buf_p[0] = '\0';
 }
 
 static struct subprocess_result_t *result_new(void)
