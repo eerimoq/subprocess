@@ -37,6 +37,7 @@ struct subprocess_output_t {
     char *buf_p;
     /* Buffer length, not incuding last null-termination. */
     size_t length;
+    /* Buffer size, including unused bytes. */
     size_t size;
 };
 
@@ -53,6 +54,13 @@ struct subprocess_result_t {
  */
 struct subprocess_result_t *subprocess_call(subprocess_entry_t entry,
                                             void *arg_p);
+
+/**
+ * Execute given command in a subprocess. Returns captured subprocess'
+ * stdout, stderr and exit code, or NULL if the subprocess could not
+ * be started.
+ */
+struct subprocess_result_t *subprocess_exec(const char *command_p);
 
 /**
  * Print subprocess exit code, stdout and stderr.

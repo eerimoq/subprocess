@@ -174,6 +174,69 @@ TEST(test_call_long_output)
     subprocess_result_free(result_p);
 }
 
+TEST(test_exec_stdout)
+{
+    struct subprocess_result_t *result_p;
+
+    result_p = subprocess_exec("cat test_exec_stdout.txt");
+
+    ASSERT_EQ(result_p->exit_code, 0);
+    ASSERT_EQ(result_p->stdout.length, 7);
+    ASSERT_EQ(result_p->stderr.length, 0);
+
+    CAPTURE_OUTPUT(output) {
+        subprocess_result_print(result_p);
+    }
+
+    subprocess_result_free(result_p);
+
+    ASSERT_EQ(output,
+              "exit_code: 0\n"
+              "stdout (length: 7):\n"
+              "hello!\n"
+              "\n"
+              "stderr (length: 0):\n"
+              "\n");
+}
+
+TEST(test_exec_false)
+{
+    struct subprocess_result_t *result_p;
+
+    result_p = subprocess_exec("false");
+
+    ASSERT_EQ(result_p->exit_code, 1);
+    ASSERT_EQ(result_p->stdout.length, 0);
+    ASSERT_EQ(result_p->stderr.length, 0);
+
+    subprocess_result_free(result_p);
+}
+
+TEST(test_exec_error_bad_command)
+{
+    struct subprocess_result_t *result_p;
+
+    result_p = subprocess_exec("test_exec_error_bad_command");
+
+    ASSERT_EQ(result_p->exit_code, 127);
+    ASSERT_EQ(result_p->stdout.length, 0);
+    ASSERT_EQ(result_p->stderr.length, 46);
+
+    CAPTURE_OUTPUT(output) {
+        subprocess_result_print(result_p);
+    }
+
+    subprocess_result_free(result_p);
+
+    ASSERT_EQ(output,
+              "exit_code: 127\n"
+              "stdout (length: 0):\n"
+              "\n"
+              "stderr (length: 46):\n"
+              "sh: 1: test_exec_error_bad_command: not found\n"
+              "\n");
+}
+
 int main()
 {
     return RUN_TESTS(
@@ -181,6 +244,9 @@ int main()
         test_call_stdout,
         test_call_stderr,
         test_call_exit,
-        test_call_long_output
+        test_call_long_output,
+        test_exec_stdout,
+        test_exec_false,
+        test_exec_error_bad_command
     );
 }

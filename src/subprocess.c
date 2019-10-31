@@ -33,12 +33,21 @@
 #include <sys/wait.h>
 #include "subprocess.h"
 
-static void output_init(struct subprocess_output_t *self_p)
+static int output_init(struct subprocess_output_t *self_p)
 {
+    int res;
+
+    res = -1;
     self_p->length = 0;
     self_p->size = 4096;
     self_p->buf_p = malloc(self_p->size);
-    self_p->buf_p[0] = '\0';
+
+    if (self_p->buf_p != NULL) {
+        self_p->buf_p[0] = '\0';
+        res = 0;
+    }
+
+    return (res);
 }
 
 static void output_print(struct subprocess_output_t *self_p,
@@ -51,16 +60,36 @@ static void output_print(struct subprocess_output_t *self_p,
 static struct subprocess_result_t *result_new(void)
 {
     struct subprocess_result_t *result_p;
+    int res;
 
     result_p = malloc(sizeof(*result_p));
 
-    if (result_p != NULL) {
-        result_p->exit_code = -1;
-        output_init(&result_p->stdout);
-        output_init(&result_p->stderr);
+    if (result_p == NULL) {
+        return (NULL);
+    }
+
+    result_p->exit_code = -1;
+    res = output_init(&result_p->stdout);
+
+    if (res != 0) {
+        goto out1;
+    }
+
+    res = output_init(&result_p->stderr);
+
+    if (res != 0) {
+        goto out2;
     }
 
     return (result_p);
+
+ out2:
+    free(result_p->stdout.buf_p);
+
+ out1:
+    free(result_p);
+
+    return (NULL);
 }
 
 static void fatal_error(const char *message_p)
@@ -141,6 +170,17 @@ static struct subprocess_result_t *call_parent(pid_t child_pid,
     return (result_p);
 }
 
+static void exec_entry(const char *command_p)
+{
+    int res;
+
+    res = execl("/bin/sh", "sh", "-c", command_p, NULL);
+
+    if (res != 0) {
+        exit(1);
+    }
+}
+
 struct subprocess_result_t *subprocess_call(subprocess_entry_t entry,
                                             void *arg_p)
 {
@@ -179,6 +219,11 @@ struct subprocess_result_t *subprocess_call(subprocess_entry_t entry,
     close(stdoutfds[1]);
 
     return (NULL);
+}
+
+struct subprocess_result_t *subprocess_exec(const char *command_p)
+{
+    return (subprocess_call((subprocess_entry_t)exec_entry, (void *)command_p));
 }
 
 void subprocess_result_print(struct subprocess_result_t *self_p)
