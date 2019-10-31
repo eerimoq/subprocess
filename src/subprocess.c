@@ -33,6 +33,12 @@
 #include <sys/wait.h>
 #include "subprocess.h"
 
+static void fatal_error(const char *message_p)
+{
+    perror(message_p);
+    exit(1);
+}
+
 static int output_init(struct subprocess_output_t *self_p)
 {
     int res;
@@ -50,11 +56,53 @@ static int output_init(struct subprocess_output_t *self_p)
     return (res);
 }
 
+static void output_append(struct subprocess_output_t *self_p, int fd)
+{
+    ssize_t res;
+
+    while (1) {
+        res = read(fd,
+                   &self_p->buf_p[self_p->length],
+                   self_p->size - self_p->length - 1);
+
+        if (res == 0) {
+            break;
+        } else if (res > 0) {
+            self_p->length += res;
+            self_p->buf_p[self_p->length] = '\0';
+
+            if ((self_p->length + 1) == self_p->size) {
+                self_p->size += 4096;
+                self_p->buf_p = realloc(self_p->buf_p, self_p->size);
+            }
+        } else {
+            if (errno != EINTR) {
+                fatal_error("read");
+            }
+        }
+    }
+
+    close(fd);
+}
+
 static void output_print(struct subprocess_output_t *self_p,
                          const char *name_p)
 {
     printf("%s (length: %ld):\n", name_p, self_p->length);
     printf("%s\n", self_p->buf_p);
+}
+
+static void redirect_output(int *fds_p, int fileno)
+{
+    close(fds_p[0]);
+    while ((dup2(fds_p[1], fileno) == -1) && (errno == EINTR));
+    close(fds_p[1]);
+}
+
+static void close_fds(int *fds_p)
+{
+    close(fds_p[0]);
+    close(fds_p[1]);
 }
 
 static struct subprocess_result_t *result_new(void)
@@ -92,50 +140,13 @@ static struct subprocess_result_t *result_new(void)
     return (NULL);
 }
 
-static void fatal_error(const char *message_p)
-{
-    perror(message_p);
-    exit(1);
-}
-
-static void output_append(struct subprocess_output_t *self_p, int fd)
-{
-    ssize_t res;
-
-    while (1) {
-        res = read(fd,
-                   &self_p->buf_p[self_p->length],
-                   self_p->size - self_p->length - 1);
-
-        if (res == 0) {
-            break;
-        } else if (res > 0) {
-            self_p->length += res;
-            self_p->buf_p[self_p->length] = '\0';
-
-            if ((self_p->length + 1) == self_p->size) {
-                self_p->size += 4096;
-                self_p->buf_p = realloc(self_p->buf_p, self_p->size);
-            }
-        } else {
-            if (errno != EINTR) {
-                fatal_error("read");
-            }
-        }
-    }
-}
-
 static void call_child(subprocess_entry_t entry,
                        void *arg_p,
                        int *stdoutfds_p,
                        int *stderrfds_p)
 {
-    while ((dup2(stdoutfds_p[1], STDOUT_FILENO) == -1) && (errno == EINTR));
-    close(stdoutfds_p[1]);
-    close(stdoutfds_p[0]);
-    while ((dup2(stderrfds_p[1], STDERR_FILENO) == -1) && (errno == EINTR));
-    close(stderrfds_p[1]);
-    close(stderrfds_p[0]);
+    redirect_output(stdoutfds_p, STDOUT_FILENO);
+    redirect_output(stderrfds_p, STDERR_FILENO);
     entry(arg_p);
 }
 
@@ -152,14 +163,13 @@ static struct subprocess_result_t *call_parent(pid_t child_pid,
         return (NULL);
     }
 
+    /* Close write ends. */
     close(stdoutfds_p[1]);
     close(stderrfds_p[1]);
 
-    /* Poll result, stdout and stderr pipes. */
+    /* Poll stdout and stderr pipes. */
     output_append(&result_p->stdout, stdoutfds_p[0]);
     output_append(&result_p->stderr, stderrfds_p[0]);
-    close(stdoutfds_p[0]);
-    close(stderrfds_p[0]);
 
     waitpid(child_pid, &status, 0);
 
@@ -211,12 +221,10 @@ struct subprocess_result_t *subprocess_call(subprocess_entry_t entry,
     return (result_p);
 
  out2:
-    close(stderrfds[0]);
-    close(stderrfds[1]);
+    close_fds(&stderrfds[0]);
 
  out1:
-    close(stdoutfds[0]);
-    close(stdoutfds[1]);
+    close_fds(&stdoutfds[0]);
 
     return (NULL);
 }
