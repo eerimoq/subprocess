@@ -157,15 +157,15 @@ static struct subprocess_result_t *call_parent(pid_t child_pid,
     struct subprocess_result_t *result_p;
     int status;
 
-    result_p = result_new();
-
-    if (result_p == NULL) {
-        return (NULL);
-    }
-
     /* Close write ends. */
     close(stdoutfds_p[1]);
     close(stderrfds_p[1]);
+
+    result_p = result_new();
+
+    if (result_p == NULL) {
+        goto out1;
+    }
 
     /* Poll stdout and stderr pipes. */
     output_append(&result_p->stdout, stdoutfds_p[0]);
@@ -178,6 +178,13 @@ static struct subprocess_result_t *call_parent(pid_t child_pid,
     }
 
     return (result_p);
+
+ out1:
+    close(stdoutfds_p[0]);
+    close(stderrfds_p[0]);
+    waitpid(child_pid, NULL, 0);
+
+    return (NULL);
 }
 
 static void exec_entry(const char *command_p)

@@ -26,9 +26,11 @@
  * This file is part of the subprocess project.
  */
 
+#include <sys/wait.h>
 #include "subprocess.h"
 #include "__mocks__.h"
 #include "narwhal.h"
+#include "mock_libc.h"
 
 static void call_no_output(void *arg_p)
 {
@@ -39,8 +41,6 @@ TEST(test_call_stdout_pipe_fail)
 {
     struct subprocess_result_t *result_p;
 
-    MOCK(close)->reset();
-    MOCK(pipe)->reset();
     MOCK(pipe)->mock_return(-1);
 
     result_p = subprocess_call(call_no_output, NULL);
@@ -50,56 +50,53 @@ TEST(test_call_stdout_pipe_fail)
     ASSERT_EQ(MOCK(close)->call_count, 0);
 }
 
-#if 0
-
 TEST(test_call_stderr_pipe_fail)
 {
     struct subprocess_result_t *result_p;
+    int stdoutfds[2] = { 3, 4 };
+    int stderrfds[2] = { -1, -1 };
 
-    MOCK(pipe)
-        ->mock_return_once(0)
-        ->mock_return_once(-1);
+    mock_push_pipe(&stdoutfds[0], 0);
+    mock_push_pipe(&stderrfds[0], -1);
+    mock_push_close(stdoutfds[0], 0);
+    mock_push_close(stdoutfds[1], 0);
+
+    MOCK(pipe)->mock_implementation(mock_pipe);
+    MOCK(close)->mock_implementation(mock_close);
 
     result_p = subprocess_call(call_no_output, NULL);
 
     ASSERT_EQ(result_p, NULL);
-}
-
-#endif
-
-static int test_call_fork_fail_pipe(int arg1[2])
-{
-    static int fd = 1;
-
-    arg1[0] = fd++;
-    arg1[1] = fd++;
-
-    return (0);
+    ASSERT_EQ(MOCK(fork)->call_count, 0);
 }
 
 TEST(test_call_fork_fail)
 {
     struct subprocess_result_t *result_p;
+    int stdoutfds[2] = { 3, 4 };
+    int stderrfds[2] = { 5, 6 };
 
-    MOCK(close)->reset();
-    MOCK(close)->mock_return(0);
-    MOCK(pipe)->mock_implementation(test_call_fork_fail_pipe);
+    mock_push_pipe(&stdoutfds[0], 0);
+    mock_push_pipe(&stderrfds[0], 0);
+    mock_push_close(stderrfds[0], 0);
+    mock_push_close(stderrfds[1], 0);
+    mock_push_close(stdoutfds[0], 0);
+    mock_push_close(stdoutfds[1], 0);
+
+    MOCK(pipe)->mock_implementation(mock_pipe);
+    MOCK(close)->mock_implementation(mock_close);
     MOCK(fork)->mock_return(-1);
 
     result_p = subprocess_call(call_no_output, NULL);
 
     ASSERT_EQ(result_p, NULL);
-    ASSERT_EQ(MOCK(close)->call_count, 4);
-    ASSERT_EQ(MOCK(close)->last_call->arg1, 2);
 }
 
 int main()
 {
     return RUN_TESTS(
         test_call_stdout_pipe_fail,
-#if 0
         test_call_stderr_pipe_fail,
-#endif
         test_call_fork_fail
     );
 }
