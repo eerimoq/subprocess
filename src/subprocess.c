@@ -206,6 +206,9 @@ struct subprocess_result_t *subprocess_call(subprocess_entry_t entry,
     int stderrfds[2];
     struct subprocess_result_t *result_p;
 
+    fflush(stdout);
+    fflush(stderr);
+
     if (pipe(stdoutfds) < 0) {
         return (NULL);
     }
