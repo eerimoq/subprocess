@@ -27,6 +27,7 @@
  */
 
 #include <string.h>
+#include <stdbool.h>
 
 #define SUBPROCESS_VERSION "0.3.0"
 
@@ -75,6 +76,12 @@ struct subprocess_result_t *subprocess_exec(const char *command_p);
  * be started.
  */
 struct subprocess_result_t *subprocess_exec_output(const char *command_p);
+
+/**
+ * Returns true if the subprocess was started and exited with 0,
+ * otherwise false.
+ */
+bool subprocess_completed_successfully(struct subprocess_result_t *result_p);
 
 /**
  * Print subprocess exit code, stdout and stderr.

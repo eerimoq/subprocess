@@ -308,3 +308,25 @@ TEST(test_exec_output_error_bad_command)
               "sh: 1: test_exec_error_bad_command: not found\n"
               "\n");
 }
+
+TEST(test_completed_successfully)
+{
+    struct subprocess_result_t *result_p;
+
+    result_p = subprocess_call(call_no_output, NULL);
+
+    ASSERT_NE(result_p, NULL);
+    ASSERT_EQ(subprocess_completed_successfully(result_p), true);
+    subprocess_result_free(result_p);
+}
+
+TEST(test_completed_successfully_exit_1)
+{
+    struct subprocess_result_t *result_p;
+
+    result_p = subprocess_call(call_exit, NULL);
+
+    ASSERT_NE(result_p, NULL);
+    ASSERT_EQ(subprocess_completed_successfully(result_p), false);
+    subprocess_result_free(result_p);
+}

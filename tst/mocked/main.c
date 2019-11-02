@@ -91,3 +91,15 @@ TEST(test_call_fork_fail)
 
     ASSERT_EQ(result_p, NULL);
 }
+
+TEST(test_completed_successfully_result_null)
+{
+    struct subprocess_result_t *result_p;
+
+    MOCK(fork)->mock_return(-1);
+
+    result_p = subprocess_call(call_no_output, NULL);
+
+    ASSERT_EQ(result_p, NULL);
+    ASSERT_EQ(subprocess_completed_successfully(result_p), false);
+}

@@ -285,6 +285,11 @@ struct subprocess_result_t *subprocess_exec_output(const char *command_p)
                                    (void *)command_p));
 }
 
+bool subprocess_completed_successfully(struct subprocess_result_t *result_p)
+{
+    return ((result_p != NULL) && (result_p->exit_code == 0));
+}
+
 void subprocess_result_print(struct subprocess_result_t *self_p)
 {
     printf("exit_code: %d\n", self_p->exit_code);
