@@ -49,18 +49,32 @@ struct subprocess_result_t {
 
 /**
  * Call given function with given argument in a subprocess. Returns
- * captured subprocess' stdout, stderr and exit code, or NULL if the
- * subprocess could not be started.
+ * captured subprocess' exit code, or NULL if the subprocess could not
+ * be started.
  */
 struct subprocess_result_t *subprocess_call(subprocess_entry_t entry,
                                             void *arg_p);
+
+/**
+ * Call given function with given argument in a subprocess. Returns
+ * captured subprocess' stdout, stderr and exit code, or NULL if the
+ * subprocess could not be started.
+ */
+struct subprocess_result_t *subprocess_call_output(subprocess_entry_t entry,
+                                                   void *arg_p);
+
+/**
+ * Execute given command in a subprocess. Returns captured subprocess'
+ * exit code, or NULL if the subprocess could not be started.
+ */
+struct subprocess_result_t *subprocess_exec(const char *command_p);
 
 /**
  * Execute given command in a subprocess. Returns captured subprocess'
  * stdout, stderr and exit code, or NULL if the subprocess could not
  * be started.
  */
-struct subprocess_result_t *subprocess_exec(const char *command_p);
+struct subprocess_result_t *subprocess_exec_output(const char *command_p);
 
 /**
  * Print subprocess exit code, stdout and stderr.

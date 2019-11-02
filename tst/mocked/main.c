@@ -43,7 +43,7 @@ TEST(test_call_stdout_pipe_fail)
 
     MOCK(pipe)->mock_return(-1);
 
-    result_p = subprocess_call(call_no_output, NULL);
+    result_p = subprocess_call_output(call_no_output, NULL);
 
     ASSERT_EQ(result_p, NULL);
     ASSERT_EQ(MOCK(pipe)->call_count, 1);
@@ -64,7 +64,7 @@ TEST(test_call_stderr_pipe_fail)
     MOCK(pipe)->mock_implementation(mock_pipe);
     MOCK(close)->mock_implementation(mock_close);
 
-    result_p = subprocess_call(call_no_output, NULL);
+    result_p = subprocess_call_output(call_no_output, NULL);
 
     ASSERT_EQ(result_p, NULL);
     ASSERT_EQ(MOCK(fork)->call_count, 0);
@@ -87,7 +87,7 @@ TEST(test_call_fork_fail)
     MOCK(close)->mock_implementation(mock_close);
     MOCK(fork)->mock_return(-1);
 
-    result_p = subprocess_call(call_no_output, NULL);
+    result_p = subprocess_call_output(call_no_output, NULL);
 
     ASSERT_EQ(result_p, NULL);
 }

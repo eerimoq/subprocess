@@ -34,11 +34,35 @@ static void call_no_output(void *arg_p)
     (void)arg_p;
 }
 
-TEST(test_call_no_output)
+TEST(test_call)
 {
     struct subprocess_result_t *result_p;
 
     result_p = subprocess_call(call_no_output, NULL);
+
+    ASSERT_EQ(result_p->exit_code, 0);
+    ASSERT_EQ(result_p->stdout.length, 0);
+    ASSERT_EQ(result_p->stderr.length, 0);
+
+    CAPTURE_OUTPUT(output) {
+        subprocess_result_print(result_p);
+    }
+
+    subprocess_result_free(result_p);
+
+    ASSERT_EQ(output,
+              "exit_code: 0\n"
+              "stdout (length: 0):\n"
+              "\n"
+              "stderr (length: 0):\n"
+              "\n");
+}
+
+TEST(test_call_output_no_output)
+{
+    struct subprocess_result_t *result_p;
+
+    result_p = subprocess_call_output(call_no_output, NULL);
 
     ASSERT_EQ(result_p->exit_code, 0);
     ASSERT_EQ(result_p->stdout.length, 0);
@@ -63,11 +87,11 @@ static void call_stdout(const char *text_p)
     printf("%s", text_p);
 }
 
-TEST(test_call_stdout)
+TEST(test_call_output_stdout)
 {
     struct subprocess_result_t *result_p;
 
-    result_p = subprocess_call((subprocess_entry_t)call_stdout, "Hello!");
+    result_p = subprocess_call_output((subprocess_entry_t)call_stdout, "Hello!");
 
     ASSERT_EQ(result_p->exit_code, 0);
     ASSERT_EQ(result_p->stdout.length, 6);
@@ -87,16 +111,40 @@ TEST(test_call_stdout)
               "\n");
 }
 
+TEST(test_call_no_captured_stdout)
+{
+    struct subprocess_result_t *result_p;
+
+    result_p = subprocess_call((subprocess_entry_t)call_stdout, "Hello!");
+
+    ASSERT_EQ(result_p->exit_code, 0);
+    ASSERT_EQ(result_p->stdout.length, 0);
+    ASSERT_EQ(result_p->stderr.length, 0);
+
+    CAPTURE_OUTPUT(output) {
+        subprocess_result_print(result_p);
+    }
+
+    subprocess_result_free(result_p);
+
+    ASSERT_EQ(output,
+              "exit_code: 0\n"
+              "stdout (length: 0):\n"
+              "\n"
+              "stderr (length: 0):\n"
+              "\n");
+}
+
 static void call_stderr(const char *text_p)
 {
     fprintf(stderr, "%s", text_p);
 }
 
-TEST(test_call_stderr)
+TEST(test_call_output_stderr)
 {
     struct subprocess_result_t *result_p;
 
-    result_p = subprocess_call((subprocess_entry_t)call_stderr, "Hello!");
+    result_p = subprocess_call_output((subprocess_entry_t)call_stderr, "Hello!");
 
     ASSERT_EQ(result_p->exit_code, 0);
     ASSERT_EQ(result_p->stdout.length, 0);
@@ -122,11 +170,11 @@ static void call_exit(void *arg_p)
     exit(1);
 }
 
-TEST(test_call_exit)
+TEST(test_call_output_exit)
 {
     struct subprocess_result_t *result_p;
 
-    result_p = subprocess_call(call_exit, NULL);
+    result_p = subprocess_call_output(call_exit, NULL);
 
     CAPTURE_OUTPUT(output) {
         subprocess_result_print(result_p);
@@ -152,12 +200,12 @@ static void call_long_output(void *arg_p)
     }
 }
 
-TEST(test_call_long_output)
+TEST(test_call_output_long_output)
 {
     int i;
     struct subprocess_result_t *result_p;
 
-    result_p = subprocess_call(call_long_output, NULL);
+    result_p = subprocess_call_output(call_long_output, NULL);
 
     ASSERT_EQ(result_p->stdout.length, 6000);
     ASSERT_EQ(result_p->stderr.length, 6000);
@@ -174,11 +222,35 @@ TEST(test_call_long_output)
     subprocess_result_free(result_p);
 }
 
-TEST(test_exec_stdout)
+TEST(test_exec_no_captured_stdout)
 {
     struct subprocess_result_t *result_p;
 
     result_p = subprocess_exec("cat test_exec_stdout.txt");
+
+    ASSERT_EQ(result_p->exit_code, 0);
+    ASSERT_EQ(result_p->stdout.length, 0);
+    ASSERT_EQ(result_p->stderr.length, 0);
+
+    CAPTURE_OUTPUT(output) {
+        subprocess_result_print(result_p);
+    }
+
+    subprocess_result_free(result_p);
+
+    ASSERT_EQ(output,
+              "exit_code: 0\n"
+              "stdout (length: 0):\n"
+              "\n"
+              "stderr (length: 0):\n"
+              "\n");
+}
+
+TEST(test_exec_output_stdout)
+{
+    struct subprocess_result_t *result_p;
+
+    result_p = subprocess_exec_output("cat test_exec_stdout.txt");
 
     ASSERT_EQ(result_p->exit_code, 0);
     ASSERT_EQ(result_p->stdout.length, 7);
@@ -199,11 +271,11 @@ TEST(test_exec_stdout)
               "\n");
 }
 
-TEST(test_exec_false)
+TEST(test_exec_output_false)
 {
     struct subprocess_result_t *result_p;
 
-    result_p = subprocess_exec("false");
+    result_p = subprocess_exec_output("false");
 
     ASSERT_EQ(result_p->exit_code, 1);
     ASSERT_EQ(result_p->stdout.length, 0);
@@ -212,11 +284,11 @@ TEST(test_exec_false)
     subprocess_result_free(result_p);
 }
 
-TEST(test_exec_error_bad_command)
+TEST(test_exec_output_error_bad_command)
 {
     struct subprocess_result_t *result_p;
 
-    result_p = subprocess_exec("test_exec_error_bad_command");
+    result_p = subprocess_exec_output("test_exec_error_bad_command");
 
     ASSERT_EQ(result_p->exit_code, 127);
     ASSERT_EQ(result_p->stdout.length, 0);

@@ -141,50 +141,61 @@ static struct subprocess_result_t *result_new(void)
 }
 
 static void call_child(subprocess_entry_t entry,
-                       void *arg_p,
-                       int *stdoutfds_p,
-                       int *stderrfds_p)
+                       void *arg_p)
 {
-    redirect_output(stdoutfds_p, STDOUT_FILENO);
-    redirect_output(stderrfds_p, STDERR_FILENO);
     entry(arg_p);
 }
 
-static struct subprocess_result_t *call_parent(pid_t child_pid,
-                                               int *stdoutfds_p,
-                                               int *stderrfds_p)
+static struct subprocess_result_t *call_parent(pid_t child_pid)
 {
     struct subprocess_result_t *result_p;
     int status;
+
+    result_p = result_new();
+
+    waitpid(child_pid, &status, 0);
+
+    if (result_p != NULL) {
+        if (WIFEXITED(status)) {
+            result_p->exit_code = WEXITSTATUS(status);
+        }
+    }
+
+    return (result_p);
+}
+
+static void call_output_child(subprocess_entry_t entry,
+                              void *arg_p,
+                              int *stdoutfds_p,
+                              int *stderrfds_p)
+{
+    redirect_output(stdoutfds_p, STDOUT_FILENO);
+    redirect_output(stderrfds_p, STDERR_FILENO);
+    call_child(entry, arg_p);
+}
+
+static struct subprocess_result_t *call_output_parent(pid_t child_pid,
+                                                      int *stdoutfds_p,
+                                                      int *stderrfds_p)
+{
+    struct subprocess_result_t *result_p;
 
     /* Close write ends. */
     close(stdoutfds_p[1]);
     close(stderrfds_p[1]);
 
-    result_p = result_new();
-
-    if (result_p == NULL) {
-        goto out1;
-    }
+    result_p = call_parent(child_pid);
 
     /* Poll stdout and stderr pipes. */
-    output_append(&result_p->stdout, stdoutfds_p[0]);
-    output_append(&result_p->stderr, stderrfds_p[0]);
-
-    waitpid(child_pid, &status, 0);
-
-    if (WIFEXITED(status)) {
-        result_p->exit_code = WEXITSTATUS(status);
+    if (result_p != NULL) {
+        output_append(&result_p->stdout, stdoutfds_p[0]);
+        output_append(&result_p->stderr, stderrfds_p[0]);
     }
 
-    return (result_p);
-
- out1:
     close(stdoutfds_p[0]);
     close(stderrfds_p[0]);
-    waitpid(child_pid, NULL, 0);
 
-    return (NULL);
+    return (result_p);
 }
 
 static void exec_entry(const char *command_p)
@@ -200,6 +211,29 @@ static void exec_entry(const char *command_p)
 
 struct subprocess_result_t *subprocess_call(subprocess_entry_t entry,
                                             void *arg_p)
+{
+    pid_t pid;
+    struct subprocess_result_t *result_p;
+
+    fflush(stdout);
+    fflush(stderr);
+
+    pid = fork();
+
+    if (pid < 0) {
+        result_p = NULL;
+    } else if (pid == 0) {
+        call_child(entry, arg_p);
+        exit(0);
+    } else {
+        result_p = call_parent(pid);
+    }
+
+    return (result_p);
+}
+
+struct subprocess_result_t *subprocess_call_output(subprocess_entry_t entry,
+                                                   void *arg_p)
 {
     pid_t pid;
     int stdoutfds[2];
@@ -222,10 +256,10 @@ struct subprocess_result_t *subprocess_call(subprocess_entry_t entry,
     if (pid < 0) {
         goto out2;
     } else if (pid == 0) {
-        call_child(entry, arg_p, &stdoutfds[0], &stderrfds[0]);
+        call_output_child(entry, arg_p, &stdoutfds[0], &stderrfds[0]);
         exit(0);
     } else {
-        result_p = call_parent(pid, &stdoutfds[0], &stderrfds[0]);
+        result_p = call_output_parent(pid, &stdoutfds[0], &stderrfds[0]);
     }
 
     return (result_p);
@@ -241,7 +275,14 @@ struct subprocess_result_t *subprocess_call(subprocess_entry_t entry,
 
 struct subprocess_result_t *subprocess_exec(const char *command_p)
 {
-    return (subprocess_call((subprocess_entry_t)exec_entry, (void *)command_p));
+    return (subprocess_call((subprocess_entry_t)exec_entry,
+                            (void *)command_p));
+}
+
+struct subprocess_result_t *subprocess_exec_output(const char *command_p)
+{
+    return (subprocess_call_output((subprocess_entry_t)exec_entry,
+                                   (void *)command_p));
 }
 
 void subprocess_result_print(struct subprocess_result_t *self_p)
