@@ -91,12 +91,3 @@ TEST(test_call_fork_fail)
 
     ASSERT_EQ(result_p, NULL);
 }
-
-int main()
-{
-    return RUN_TESTS(
-        test_call_stdout_pipe_fail,
-        test_call_stderr_pipe_fail,
-        test_call_fork_fail
-    );
-}

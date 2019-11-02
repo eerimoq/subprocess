@@ -236,17 +236,3 @@ TEST(test_exec_error_bad_command)
               "sh: 1: test_exec_error_bad_command: not found\n"
               "\n");
 }
-
-int main()
-{
-    return RUN_TESTS(
-        test_call_no_output,
-        test_call_stdout,
-        test_call_stderr,
-        test_call_exit,
-        test_call_long_output,
-        test_exec_stdout,
-        test_exec_false,
-        test_exec_error_bad_command
-    );
-}
