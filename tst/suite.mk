@@ -20,6 +20,5 @@ test:
 	./main
 
 __mocks__.c: main.c
-	$(CC) $(CFLAGS) -E main.c > __mocks__.pp.c
-	cat __mocks__.pp.c | narmock -g
-	cat __mocks__.pp.c | narmock -f > __mocks__.ld
+	$(CC) $(CFLAGS) -E main.c | narmock -g
+	narmock -f > __mocks__.ld
