@@ -165,7 +165,7 @@ const char *narwhal_assertion_process_string(const char *string);
     do                                                         \
     {                                                          \
         narwhal_fail_test(_narwhal_current_test, __VA_ARGS__); \
-        return;                                                \
+        exit(1);                                               \
     } while (0)
 
 #define FAIL(...)                                                                            \

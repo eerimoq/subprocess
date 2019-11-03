@@ -7,8 +7,8 @@ Do not edit manually
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdbool.h>
-#include <assert.h>
 #include <string.h>
+#include "narwhal.h"
 
 #include <errno.h>
 #include <stddef.h>
@@ -121,8 +121,13 @@ int __wrap_close(int __fd)
     case 1:
         instance_p = _narmock_state_for_close.instances.head_p;
 
+        if (instance_p == NULL) {
+            FAIL();
+            while (1);
+        }
+
         if (!instance_p->ignore___fd_in) {
-            assert(__fd == instance_p->params.__fd);
+            ASSERT_EQ(__fd, instance_p->params.__fd);
         }
 
 
@@ -138,7 +143,8 @@ int __wrap_close(int __fd)
         break;
 
     case 3:
-        assert(0);
+        FAIL();
+        while (1);
         break;
 
     default:
@@ -231,7 +237,7 @@ static const _narmock_state_type_for_close *_narmock_reset_function_for_close(vo
 
 static const _narmock_state_type_for_close *_narmock_assert_completed_function_for_close(void)
 {
-    assert(_narmock_state_for_close.instances.head_p == NULL);
+    ASSERT_EQ(_narmock_state_for_close.instances.head_p, NULL);
 
     return &_narmock_state_for_close.public;
 }
@@ -316,6 +322,11 @@ __pid_t __wrap_fork(void)
     case 1:
         instance_p = _narmock_state_for_fork.instances.head_p;
 
+        if (instance_p == NULL) {
+            FAIL();
+            while (1);
+        }
+
 
 
         _narmock_state_for_fork.instances.head_p = instance_p->next_p;
@@ -330,7 +341,8 @@ __pid_t __wrap_fork(void)
         break;
 
     case 3:
-        assert(0);
+        FAIL();
+        while (1);
         break;
 
     default:
@@ -410,7 +422,7 @@ static const _narmock_state_type_for_fork *_narmock_reset_function_for_fork(void
 
 static const _narmock_state_type_for_fork *_narmock_assert_completed_function_for_fork(void)
 {
-    assert(_narmock_state_for_fork.instances.head_p == NULL);
+    ASSERT_EQ(_narmock_state_for_fork.instances.head_p, NULL);
 
     return &_narmock_state_for_fork.public;
 }
@@ -505,8 +517,13 @@ int __wrap_pipe(int __pipedes[2])
     case 1:
         instance_p = _narmock_state_for_pipe.instances.head_p;
 
+        if (instance_p == NULL) {
+            FAIL();
+            while (1);
+        }
+
         if (!instance_p->ignore___pipedes_in) {
-            assert(__pipedes == instance_p->params.__pipedes);
+            ASSERT_EQ(__pipedes, instance_p->params.__pipedes);
         }
 
         if (instance_p->__pipedes_out.buf_p != NULL) {
@@ -515,9 +532,9 @@ int __wrap_pipe(int __pipedes[2])
         }
 
         if (instance_p->__pipedes_in.buf_p != NULL) {
-            assert(memcmp(__pipedes,
+            ASSERT_MEMORY(__pipedes,
                           instance_p->__pipedes_in.buf_p,
-                          instance_p->__pipedes_in.size) == 0);
+                          instance_p->__pipedes_in.size);
             free(instance_p->__pipedes_in.buf_p);
         }
 
@@ -533,7 +550,8 @@ int __wrap_pipe(int __pipedes[2])
         break;
 
     case 3:
-        assert(0);
+        FAIL();
+        while (1);
         break;
 
     default:
@@ -659,7 +677,7 @@ static const _narmock_state_type_for_pipe *_narmock_reset_function_for_pipe(void
 
 static const _narmock_state_type_for_pipe *_narmock_assert_completed_function_for_pipe(void)
 {
-    assert(_narmock_state_for_pipe.instances.head_p == NULL);
+    ASSERT_EQ(_narmock_state_for_pipe.instances.head_p, NULL);
 
     return &_narmock_state_for_pipe.public;
 }
@@ -762,14 +780,19 @@ ssize_t __wrap_read(int __fd, void *__buf, size_t __nbytes)
     case 1:
         instance_p = _narmock_state_for_read.instances.head_p;
 
+        if (instance_p == NULL) {
+            FAIL();
+            while (1);
+        }
+
         if (!instance_p->ignore___fd_in) {
-            assert(__fd == instance_p->params.__fd);
+            ASSERT_EQ(__fd, instance_p->params.__fd);
         }
         if (!instance_p->ignore___buf_in) {
-            assert(__buf == instance_p->params.__buf);
+            ASSERT_EQ(__buf, instance_p->params.__buf);
         }
         if (!instance_p->ignore___nbytes_in) {
-            assert(__nbytes == instance_p->params.__nbytes);
+            ASSERT_EQ(__nbytes, instance_p->params.__nbytes);
         }
 
         if (instance_p->__buf_out.buf_p != NULL) {
@@ -778,9 +801,9 @@ ssize_t __wrap_read(int __fd, void *__buf, size_t __nbytes)
         }
 
         if (instance_p->__buf_in.buf_p != NULL) {
-            assert(memcmp(__buf,
+            ASSERT_MEMORY(__buf,
                           instance_p->__buf_in.buf_p,
-                          instance_p->__buf_in.size) == 0);
+                          instance_p->__buf_in.size);
             free(instance_p->__buf_in.buf_p);
         }
 
@@ -796,7 +819,8 @@ ssize_t __wrap_read(int __fd, void *__buf, size_t __nbytes)
         break;
 
     case 3:
-        assert(0);
+        FAIL();
+        while (1);
         break;
 
     default:
@@ -948,7 +972,7 @@ static const _narmock_state_type_for_read *_narmock_reset_function_for_read(void
 
 static const _narmock_state_type_for_read *_narmock_assert_completed_function_for_read(void)
 {
-    assert(_narmock_state_for_read.instances.head_p == NULL);
+    ASSERT_EQ(_narmock_state_for_read.instances.head_p, NULL);
 
     return &_narmock_state_for_read.public;
 }
