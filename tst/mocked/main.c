@@ -41,33 +41,37 @@ TEST(test_call_stdout_pipe_fail)
 {
     struct subprocess_result_t *result_p;
 
-    MOCK(pipe)->mock_return(-1);
+    MOCK(pipe)->mock_once(-1);
+    MOCK(close)->mock_none();
 
     result_p = subprocess_call_output(call_no_output, NULL);
 
     ASSERT_EQ(result_p, NULL);
-    ASSERT_EQ(MOCK(pipe)->call_count, 1);
-    ASSERT_EQ(MOCK(close)->call_count, 0);
+
+    MOCK(pipe)->assert_completed();
+    MOCK(close)->assert_completed();
 }
 
 TEST(test_call_stderr_pipe_fail)
 {
     struct subprocess_result_t *result_p;
     int stdoutfds[2] = { 3, 4 };
-    int stderrfds[2] = { -1, -1 };
 
-    mock_push_pipe(&stdoutfds[0], 0);
-    mock_push_pipe(&stderrfds[0], -1);
-    mock_push_close(stdoutfds[0], 0);
-    mock_push_close(stdoutfds[1], 0);
-
-    MOCK(pipe)->mock_implementation(mock_pipe);
-    MOCK(close)->mock_implementation(mock_close);
+    MOCK(pipe)
+        ->mock_once(0)
+        ->set___pipedes_out(&stdoutfds[0], sizeof(stdoutfds));
+    MOCK(pipe)->mock_once(-1);
+    MOCK(fork)->mock_none();
+    MOCK(close)->mock_once(stdoutfds[0], 0);
+    MOCK(close)->mock_once(stdoutfds[1], 0);
 
     result_p = subprocess_call_output(call_no_output, NULL);
 
     ASSERT_EQ(result_p, NULL);
-    ASSERT_EQ(MOCK(fork)->call_count, 0);
+
+    MOCK(pipe)->assert_completed();
+    MOCK(fork)->assert_completed();
+    MOCK(close)->assert_completed();
 }
 
 TEST(test_call_fork_fail)
@@ -76,30 +80,37 @@ TEST(test_call_fork_fail)
     int stdoutfds[2] = { 3, 4 };
     int stderrfds[2] = { 5, 6 };
 
-    mock_push_pipe(&stdoutfds[0], 0);
-    mock_push_pipe(&stderrfds[0], 0);
-    mock_push_close(stderrfds[0], 0);
-    mock_push_close(stderrfds[1], 0);
-    mock_push_close(stdoutfds[0], 0);
-    mock_push_close(stdoutfds[1], 0);
-
-    MOCK(pipe)->mock_implementation(mock_pipe);
-    MOCK(close)->mock_implementation(mock_close);
-    MOCK(fork)->mock_return(-1);
+    MOCK(pipe)
+        ->mock_once(0)
+        ->set___pipedes_out(&stdoutfds[0], sizeof(stdoutfds));
+    MOCK(pipe)
+        ->mock_once(0)
+        ->set___pipedes_out(&stderrfds[0], sizeof(stderrfds));
+    MOCK(fork)->mock_once(-1);
+    MOCK(close)->mock_once(stderrfds[0], 0);
+    MOCK(close)->mock_once(stderrfds[1], 0);
+    MOCK(close)->mock_once(stdoutfds[0], 0);
+    MOCK(close)->mock_once(stdoutfds[1], 0);
 
     result_p = subprocess_call_output(call_no_output, NULL);
 
     ASSERT_EQ(result_p, NULL);
+
+    MOCK(pipe)->assert_completed();
+    MOCK(fork)->assert_completed();
+    MOCK(close)->assert_completed();
 }
 
 TEST(test_completed_successfully_result_null)
 {
     struct subprocess_result_t *result_p;
 
-    MOCK(fork)->mock_return(-1);
+    MOCK(fork)->mock_once(-1);
 
     result_p = subprocess_call(call_no_output, NULL);
 
     ASSERT_EQ(result_p, NULL);
     ASSERT_EQ(subprocess_completed_successfully(result_p), false);
+
+    MOCK(fork)->assert_completed();
 }

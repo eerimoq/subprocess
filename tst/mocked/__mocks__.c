@@ -4,11 +4,37 @@ Mocks source file
 Generated with Narmock v0.2.12 (https://github.com/vberlier/narmock)
 Do not edit manually
 */
+#include <stdlib.h>
+#include <stdio.h>
+#include <stdbool.h>
+#include <assert.h>
+#include <string.h>
 
 #include <errno.h>
 #include <stddef.h>
 
 #include "__mocks__.h"
+
+typedef struct _narmock_set_param _narmock_set_param;
+
+struct _narmock_set_param {
+    void *buf_p;
+    size_t size;
+};
+
+static void *xmalloc(size_t size)
+{
+    void *buf_p;
+
+    buf_p = malloc(size);
+
+    if (buf_p == NULL) {
+        perror("malloc");
+        exit(1);
+    }
+
+    return (buf_p);
+}
 
 void narmock_reset_all_mocks(void)
 {
@@ -19,87 +45,166 @@ void narmock_reset_all_mocks(void)
 
 // NARMOCK_IMPLEMENTATION close
 
-int __real_close(int arg1);
+int __real_close(int __fd);
+
+typedef struct _narmock_params_type_for_close _narmock_params_type_for_close;
+
+struct _narmock_params_type_for_close
+{
+    int __fd;
+    int return_value;
+};
+
+typedef struct _narmock_instance_type_for_close _narmock_instance_type_for_close;
+
+struct _narmock_instance_type_for_close
+{
+    _narmock_params_type_for_close params;
+    bool ignore___fd_in;
+    int errno_value;
+    _narmock_instance_type_for_close *next_p;
+};
+
+typedef struct _narmock_instances_type_for_close _narmock_instances_type_for_close;
+
+struct _narmock_instances_type_for_close {
+    _narmock_instance_type_for_close *head_p;
+    _narmock_instance_type_for_close *tail_p;
+};
 
 typedef struct _narmock_private_state_type_for_close _narmock_private_state_type_for_close;
 
 struct _narmock_private_state_type_for_close
 {
     _narmock_state_type_for_close public;
-
     int mode;
-    int return_value;
-    int (*implementation)(int arg1);
-    int errno_value;
-    _narmock_params_type_for_close last_call;
+    _narmock_instances_type_for_close instances;
+    int (*implementation)(int __fd);
 };
 
-static const _narmock_state_type_for_close *_narmock_mock_return_function_for_close(int return_value);
-static const _narmock_state_type_for_close *_narmock_mock_implementation_function_for_close(int (*implementation)(int arg1));
-static const _narmock_state_type_for_close *_narmock_mock_errno_function_for_close(int errno_value);
+static const _narmock_state_type_for_close *_narmock_mock_once_function_for_close(int __fd, int return_value);
+static const _narmock_state_type_for_close *_narmock_set_errno_function_for_close(int errno_value);
+static const _narmock_state_type_for_close *_narmock_ignore___fd_in_function_for_close(void);
+static const _narmock_state_type_for_close *_narmock_mock_none_function_for_close(void);
+static const _narmock_state_type_for_close *_narmock_mock_implementation_function_for_close(int (*implementation)(int __fd));
 static const _narmock_state_type_for_close *_narmock_disable_mock_function_for_close(void);
 static const _narmock_state_type_for_close *_narmock_reset_function_for_close(void);
+static const _narmock_state_type_for_close *_narmock_assert_completed_function_for_close(void);
 
 static _narmock_private_state_type_for_close _narmock_state_for_close =
 {
     .public = {
-        .mock_return = _narmock_mock_return_function_for_close,
+        .mock_once = _narmock_mock_once_function_for_close,
+        .set_errno = _narmock_set_errno_function_for_close,
+        .ignore___fd_in = _narmock_ignore___fd_in_function_for_close,
+        .mock_none = _narmock_mock_none_function_for_close,
         .mock_implementation = _narmock_mock_implementation_function_for_close,
-        .mock_errno = _narmock_mock_errno_function_for_close,
         .disable_mock = _narmock_disable_mock_function_for_close,
         .reset = _narmock_reset_function_for_close,
-        .call_count = 0,
-        .last_call = NULL
+        .assert_completed = _narmock_assert_completed_function_for_close
     },
-
     .mode = 0,
-    .errno_value = 0
+    .instances = {
+        .head_p = NULL,
+        .tail_p = NULL
+    }
 };
 
-int __wrap_close(int arg1)
+int __wrap_close(int __fd)
 {
+    struct _narmock_instance_type_for_close *instance_p;
     int return_value;
 
-    switch (_narmock_state_for_close.mode)
-    {
-        case 1:
-            return_value =
-            _narmock_state_for_close.return_value;
-            break;
-        case 2:
-            return_value =
-            _narmock_state_for_close.implementation(arg1);
-            break;
-        default:
-            return_value =
-            __real_close(arg1);
-            break;
+    switch (_narmock_state_for_close.mode) {
+
+    case 1:
+        instance_p = _narmock_state_for_close.instances.head_p;
+
+        if (!instance_p->ignore___fd_in) {
+            assert(__fd == instance_p->params.__fd);
+        }
+
+
+        _narmock_state_for_close.instances.head_p = instance_p->next_p;
+        errno = instance_p->errno_value;
+        return_value = instance_p->params.return_value;
+        free(instance_p);
+        break;
+
+    case 2:
+        return_value =
+        _narmock_state_for_close.implementation(__fd);
+        break;
+
+    case 3:
+        assert(0);
+        break;
+
+    default:
+        return_value =
+        __real_close(__fd);
+        break;
     }
-
-    if (_narmock_state_for_close.errno_value != 0)
-    {
-        errno = _narmock_state_for_close.errno_value;
-    }
-
-    _narmock_state_for_close.public.call_count++;
-
-    _narmock_params_type_for_close last_call = { arg1, return_value, errno };
-
-    _narmock_state_for_close.last_call = last_call;
-    _narmock_state_for_close.public.last_call = &_narmock_state_for_close.last_call;
 
     return return_value;
 }
 
-static const _narmock_state_type_for_close *_narmock_mock_return_function_for_close(int return_value)
+static const _narmock_state_type_for_close *_narmock_mock_once_function_for_close(int __fd, int return_value)
 {
+    struct _narmock_instance_type_for_close *instance_p;
+
     _narmock_state_for_close.mode = 1;
-    _narmock_state_for_close.return_value = return_value;
+    instance_p = xmalloc(sizeof(*instance_p));
+    instance_p->params.__fd = __fd;
+    instance_p->ignore___fd_in = false;
+    instance_p->params.return_value = return_value;
+    instance_p->errno_value = 0;
+    instance_p->next_p = NULL;
+
+    if (_narmock_state_for_close.instances.head_p == NULL) {
+        _narmock_state_for_close.instances.head_p = instance_p;
+    } else {
+        _narmock_state_for_close.instances.tail_p->next_p = instance_p;
+    }
+
+    _narmock_state_for_close.instances.tail_p = instance_p;
 
     return &_narmock_state_for_close.public;
 }
 
-static const _narmock_state_type_for_close *_narmock_mock_implementation_function_for_close(int (*implementation)(int arg1))
+static const _narmock_state_type_for_close *_narmock_set_errno_function_for_close(int errno_value)
+{
+    if (_narmock_state_for_close.instances.tail_p == NULL) {
+        printf("No mock instance.\n");
+        exit(1);
+    }
+
+    _narmock_state_for_close.instances.tail_p->errno_value = errno_value;
+
+    return &_narmock_state_for_close.public;
+}
+
+static const _narmock_state_type_for_close *_narmock_ignore___fd_in_function_for_close(void)
+{
+    if (_narmock_state_for_close.instances.tail_p == NULL) {
+        printf("No mock instance.\n");
+        exit(1);
+    }
+
+    _narmock_state_for_close.instances.tail_p->ignore___fd_in = true;
+
+    return &_narmock_state_for_close.public;
+}
+
+
+static const _narmock_state_type_for_close *_narmock_mock_none_function_for_close(void)
+{
+    _narmock_state_for_close.mode = 3;
+
+    return &_narmock_state_for_close.public;
+}
+
+static const _narmock_state_type_for_close *_narmock_mock_implementation_function_for_close(int (*implementation)(int __fd))
 {
     _narmock_state_for_close.mode = 2;
     _narmock_state_for_close.implementation = implementation;
@@ -107,17 +212,9 @@ static const _narmock_state_type_for_close *_narmock_mock_implementation_functio
     return &_narmock_state_for_close.public;
 }
 
-static const _narmock_state_type_for_close *_narmock_mock_errno_function_for_close(int errno_value)
-{
-    _narmock_state_for_close.errno_value = errno_value;
-
-    return &_narmock_state_for_close.public;
-}
-
 static const _narmock_state_type_for_close *_narmock_disable_mock_function_for_close(void)
 {
     _narmock_state_for_close.mode = 0;
-    _narmock_state_for_close.errno_value = 0;
 
     return &_narmock_state_for_close.public;
 }
@@ -125,9 +222,15 @@ static const _narmock_state_type_for_close *_narmock_disable_mock_function_for_c
 static const _narmock_state_type_for_close *_narmock_reset_function_for_close(void)
 {
     _narmock_state_for_close.mode = 0;
-    _narmock_state_for_close.errno_value = 0;
-    _narmock_state_for_close.public.call_count = 0;
-    _narmock_state_for_close.public.last_call = NULL;
+    _narmock_state_for_close.instances.head_p = NULL;
+    _narmock_state_for_close.instances.tail_p = NULL;
+
+    return &_narmock_state_for_close.public;
+}
+
+static const _narmock_state_type_for_close *_narmock_assert_completed_function_for_close(void)
+{
+    assert(_narmock_state_for_close.instances.head_p == NULL);
 
     return &_narmock_state_for_close.public;
 }
@@ -143,80 +246,139 @@ const _narmock_state_type_for_close *_narmock_get_mock_for_close(const void *fun
 
 __pid_t __real_fork(void);
 
+typedef struct _narmock_params_type_for_fork _narmock_params_type_for_fork;
+
+struct _narmock_params_type_for_fork
+{
+    __pid_t return_value;
+};
+
+typedef struct _narmock_instance_type_for_fork _narmock_instance_type_for_fork;
+
+struct _narmock_instance_type_for_fork
+{
+    _narmock_params_type_for_fork params;
+    int errno_value;
+    _narmock_instance_type_for_fork *next_p;
+};
+
+typedef struct _narmock_instances_type_for_fork _narmock_instances_type_for_fork;
+
+struct _narmock_instances_type_for_fork {
+    _narmock_instance_type_for_fork *head_p;
+    _narmock_instance_type_for_fork *tail_p;
+};
+
 typedef struct _narmock_private_state_type_for_fork _narmock_private_state_type_for_fork;
 
 struct _narmock_private_state_type_for_fork
 {
     _narmock_state_type_for_fork public;
-
     int mode;
-    __pid_t return_value;
+    _narmock_instances_type_for_fork instances;
     __pid_t (*implementation)(void);
-    int errno_value;
-    _narmock_params_type_for_fork last_call;
 };
 
-static const _narmock_state_type_for_fork *_narmock_mock_return_function_for_fork(__pid_t return_value);
+static const _narmock_state_type_for_fork *_narmock_mock_once_function_for_fork(__pid_t return_value);
+static const _narmock_state_type_for_fork *_narmock_set_errno_function_for_fork(int errno_value);
+static const _narmock_state_type_for_fork *_narmock_mock_none_function_for_fork(void);
 static const _narmock_state_type_for_fork *_narmock_mock_implementation_function_for_fork(__pid_t (*implementation)(void));
-static const _narmock_state_type_for_fork *_narmock_mock_errno_function_for_fork(int errno_value);
 static const _narmock_state_type_for_fork *_narmock_disable_mock_function_for_fork(void);
 static const _narmock_state_type_for_fork *_narmock_reset_function_for_fork(void);
+static const _narmock_state_type_for_fork *_narmock_assert_completed_function_for_fork(void);
 
 static _narmock_private_state_type_for_fork _narmock_state_for_fork =
 {
     .public = {
-        .mock_return = _narmock_mock_return_function_for_fork,
+        .mock_once = _narmock_mock_once_function_for_fork,
+        .set_errno = _narmock_set_errno_function_for_fork,
+        .mock_none = _narmock_mock_none_function_for_fork,
         .mock_implementation = _narmock_mock_implementation_function_for_fork,
-        .mock_errno = _narmock_mock_errno_function_for_fork,
         .disable_mock = _narmock_disable_mock_function_for_fork,
         .reset = _narmock_reset_function_for_fork,
-        .call_count = 0,
-        .last_call = NULL
+        .assert_completed = _narmock_assert_completed_function_for_fork
     },
-
     .mode = 0,
-    .errno_value = 0
+    .instances = {
+        .head_p = NULL,
+        .tail_p = NULL
+    }
 };
 
 __pid_t __wrap_fork(void)
 {
+    struct _narmock_instance_type_for_fork *instance_p;
     __pid_t return_value;
 
-    switch (_narmock_state_for_fork.mode)
-    {
-        case 1:
-            return_value =
-            _narmock_state_for_fork.return_value;
-            break;
-        case 2:
-            return_value =
-            _narmock_state_for_fork.implementation();
-            break;
-        default:
-            return_value =
-            __real_fork();
-            break;
+    switch (_narmock_state_for_fork.mode) {
+
+    case 1:
+        instance_p = _narmock_state_for_fork.instances.head_p;
+
+
+
+        _narmock_state_for_fork.instances.head_p = instance_p->next_p;
+        errno = instance_p->errno_value;
+        return_value = instance_p->params.return_value;
+        free(instance_p);
+        break;
+
+    case 2:
+        return_value =
+        _narmock_state_for_fork.implementation();
+        break;
+
+    case 3:
+        assert(0);
+        break;
+
+    default:
+        return_value =
+        __real_fork();
+        break;
     }
-
-    if (_narmock_state_for_fork.errno_value != 0)
-    {
-        errno = _narmock_state_for_fork.errno_value;
-    }
-
-    _narmock_state_for_fork.public.call_count++;
-
-    _narmock_params_type_for_fork last_call = { return_value, errno };
-
-    _narmock_state_for_fork.last_call = last_call;
-    _narmock_state_for_fork.public.last_call = &_narmock_state_for_fork.last_call;
 
     return return_value;
 }
 
-static const _narmock_state_type_for_fork *_narmock_mock_return_function_for_fork(__pid_t return_value)
+static const _narmock_state_type_for_fork *_narmock_mock_once_function_for_fork(__pid_t return_value)
 {
+    struct _narmock_instance_type_for_fork *instance_p;
+
     _narmock_state_for_fork.mode = 1;
-    _narmock_state_for_fork.return_value = return_value;
+    instance_p = xmalloc(sizeof(*instance_p));
+    instance_p->params.return_value = return_value;
+    instance_p->errno_value = 0;
+    instance_p->next_p = NULL;
+
+    if (_narmock_state_for_fork.instances.head_p == NULL) {
+        _narmock_state_for_fork.instances.head_p = instance_p;
+    } else {
+        _narmock_state_for_fork.instances.tail_p->next_p = instance_p;
+    }
+
+    _narmock_state_for_fork.instances.tail_p = instance_p;
+
+    return &_narmock_state_for_fork.public;
+}
+
+static const _narmock_state_type_for_fork *_narmock_set_errno_function_for_fork(int errno_value)
+{
+    if (_narmock_state_for_fork.instances.tail_p == NULL) {
+        printf("No mock instance.\n");
+        exit(1);
+    }
+
+    _narmock_state_for_fork.instances.tail_p->errno_value = errno_value;
+
+    return &_narmock_state_for_fork.public;
+}
+
+
+
+static const _narmock_state_type_for_fork *_narmock_mock_none_function_for_fork(void)
+{
+    _narmock_state_for_fork.mode = 3;
 
     return &_narmock_state_for_fork.public;
 }
@@ -229,17 +391,9 @@ static const _narmock_state_type_for_fork *_narmock_mock_implementation_function
     return &_narmock_state_for_fork.public;
 }
 
-static const _narmock_state_type_for_fork *_narmock_mock_errno_function_for_fork(int errno_value)
-{
-    _narmock_state_for_fork.errno_value = errno_value;
-
-    return &_narmock_state_for_fork.public;
-}
-
 static const _narmock_state_type_for_fork *_narmock_disable_mock_function_for_fork(void)
 {
     _narmock_state_for_fork.mode = 0;
-    _narmock_state_for_fork.errno_value = 0;
 
     return &_narmock_state_for_fork.public;
 }
@@ -247,9 +401,15 @@ static const _narmock_state_type_for_fork *_narmock_disable_mock_function_for_fo
 static const _narmock_state_type_for_fork *_narmock_reset_function_for_fork(void)
 {
     _narmock_state_for_fork.mode = 0;
-    _narmock_state_for_fork.errno_value = 0;
-    _narmock_state_for_fork.public.call_count = 0;
-    _narmock_state_for_fork.public.last_call = NULL;
+    _narmock_state_for_fork.instances.head_p = NULL;
+    _narmock_state_for_fork.instances.tail_p = NULL;
+
+    return &_narmock_state_for_fork.public;
+}
+
+static const _narmock_state_type_for_fork *_narmock_assert_completed_function_for_fork(void)
+{
+    assert(_narmock_state_for_fork.instances.head_p == NULL);
 
     return &_narmock_state_for_fork.public;
 }
@@ -263,87 +423,216 @@ const _narmock_state_type_for_fork *_narmock_get_mock_for_fork(const void *funct
 
 // NARMOCK_IMPLEMENTATION pipe
 
-int __real_pipe(int arg1[2]);
+int __real_pipe(int __pipedes[2]);
+
+typedef struct _narmock_params_type_for_pipe _narmock_params_type_for_pipe;
+
+struct _narmock_params_type_for_pipe
+{
+    int *__pipedes;
+    int return_value;
+};
+
+typedef struct _narmock_instance_type_for_pipe _narmock_instance_type_for_pipe;
+
+struct _narmock_instance_type_for_pipe
+{
+    _narmock_params_type_for_pipe params;
+    bool ignore___pipedes_in;
+    _narmock_set_param __pipedes_in;
+    _narmock_set_param __pipedes_out;
+    int errno_value;
+    _narmock_instance_type_for_pipe *next_p;
+};
+
+typedef struct _narmock_instances_type_for_pipe _narmock_instances_type_for_pipe;
+
+struct _narmock_instances_type_for_pipe {
+    _narmock_instance_type_for_pipe *head_p;
+    _narmock_instance_type_for_pipe *tail_p;
+};
 
 typedef struct _narmock_private_state_type_for_pipe _narmock_private_state_type_for_pipe;
 
 struct _narmock_private_state_type_for_pipe
 {
     _narmock_state_type_for_pipe public;
-
     int mode;
-    int return_value;
-    int (*implementation)(int arg1[2]);
-    int errno_value;
-    _narmock_params_type_for_pipe last_call;
+    _narmock_instances_type_for_pipe instances;
+    int (*implementation)(int __pipedes[2]);
 };
 
-static const _narmock_state_type_for_pipe *_narmock_mock_return_function_for_pipe(int return_value);
-static const _narmock_state_type_for_pipe *_narmock_mock_implementation_function_for_pipe(int (*implementation)(int arg1[2]));
-static const _narmock_state_type_for_pipe *_narmock_mock_errno_function_for_pipe(int errno_value);
+static const _narmock_state_type_for_pipe *_narmock_mock_once_function_for_pipe(int return_value);
+static const _narmock_state_type_for_pipe *_narmock_set_errno_function_for_pipe(int errno_value);
+static const _narmock_state_type_for_pipe *_narmock_set___pipedes_in_function_for_pipe(const void *buf_p, size_t size);
+static const _narmock_state_type_for_pipe *_narmock_set___pipedes_in_pointer_function_for_pipe(int __pipedes[2]);
+static const _narmock_state_type_for_pipe *_narmock_set___pipedes_out_function_for_pipe(const void *buf_p, size_t size);
+static const _narmock_state_type_for_pipe *_narmock_mock_none_function_for_pipe(void);
+static const _narmock_state_type_for_pipe *_narmock_mock_implementation_function_for_pipe(int (*implementation)(int __pipedes[2]));
 static const _narmock_state_type_for_pipe *_narmock_disable_mock_function_for_pipe(void);
 static const _narmock_state_type_for_pipe *_narmock_reset_function_for_pipe(void);
+static const _narmock_state_type_for_pipe *_narmock_assert_completed_function_for_pipe(void);
 
 static _narmock_private_state_type_for_pipe _narmock_state_for_pipe =
 {
     .public = {
-        .mock_return = _narmock_mock_return_function_for_pipe,
+        .mock_once = _narmock_mock_once_function_for_pipe,
+        .set_errno = _narmock_set_errno_function_for_pipe,
+        .set___pipedes_in = _narmock_set___pipedes_in_function_for_pipe,
+        .set___pipedes_in_pointer = _narmock_set___pipedes_in_pointer_function_for_pipe,
+        .set___pipedes_out = _narmock_set___pipedes_out_function_for_pipe,
+        .mock_none = _narmock_mock_none_function_for_pipe,
         .mock_implementation = _narmock_mock_implementation_function_for_pipe,
-        .mock_errno = _narmock_mock_errno_function_for_pipe,
         .disable_mock = _narmock_disable_mock_function_for_pipe,
         .reset = _narmock_reset_function_for_pipe,
-        .call_count = 0,
-        .last_call = NULL
+        .assert_completed = _narmock_assert_completed_function_for_pipe
     },
-
     .mode = 0,
-    .errno_value = 0
+    .instances = {
+        .head_p = NULL,
+        .tail_p = NULL
+    }
 };
 
-int __wrap_pipe(int arg1[2])
+int __wrap_pipe(int __pipedes[2])
 {
+    struct _narmock_instance_type_for_pipe *instance_p;
     int return_value;
 
-    switch (_narmock_state_for_pipe.mode)
-    {
-        case 1:
-            return_value =
-            _narmock_state_for_pipe.return_value;
-            break;
-        case 2:
-            return_value =
-            _narmock_state_for_pipe.implementation(arg1);
-            break;
-        default:
-            return_value =
-            __real_pipe(arg1);
-            break;
+    switch (_narmock_state_for_pipe.mode) {
+
+    case 1:
+        instance_p = _narmock_state_for_pipe.instances.head_p;
+
+        if (!instance_p->ignore___pipedes_in) {
+            assert(__pipedes == instance_p->params.__pipedes);
+        }
+
+        if (instance_p->__pipedes_out.buf_p != NULL) {
+            memcpy((void *)__pipedes, instance_p->__pipedes_out.buf_p, instance_p->__pipedes_out.size);
+            free(instance_p->__pipedes_out.buf_p);
+        }
+
+        if (instance_p->__pipedes_in.buf_p != NULL) {
+            assert(memcmp(__pipedes,
+                          instance_p->__pipedes_in.buf_p,
+                          instance_p->__pipedes_in.size) == 0);
+            free(instance_p->__pipedes_in.buf_p);
+        }
+
+        _narmock_state_for_pipe.instances.head_p = instance_p->next_p;
+        errno = instance_p->errno_value;
+        return_value = instance_p->params.return_value;
+        free(instance_p);
+        break;
+
+    case 2:
+        return_value =
+        _narmock_state_for_pipe.implementation(__pipedes);
+        break;
+
+    case 3:
+        assert(0);
+        break;
+
+    default:
+        return_value =
+        __real_pipe(__pipedes);
+        break;
     }
-
-    if (_narmock_state_for_pipe.errno_value != 0)
-    {
-        errno = _narmock_state_for_pipe.errno_value;
-    }
-
-    _narmock_state_for_pipe.public.call_count++;
-
-    _narmock_params_type_for_pipe last_call = { arg1, return_value, errno };
-
-    _narmock_state_for_pipe.last_call = last_call;
-    _narmock_state_for_pipe.public.last_call = &_narmock_state_for_pipe.last_call;
 
     return return_value;
 }
 
-static const _narmock_state_type_for_pipe *_narmock_mock_return_function_for_pipe(int return_value)
+static const _narmock_state_type_for_pipe *_narmock_mock_once_function_for_pipe(int return_value)
 {
+    struct _narmock_instance_type_for_pipe *instance_p;
+
     _narmock_state_for_pipe.mode = 1;
-    _narmock_state_for_pipe.return_value = return_value;
+    instance_p = xmalloc(sizeof(*instance_p));
+    instance_p->__pipedes_out.buf_p = NULL;
+    instance_p->__pipedes_out.size = 0;
+    instance_p->__pipedes_in.buf_p = NULL;
+    instance_p->__pipedes_in.size = 0;
+    instance_p->params.__pipedes = NULL;
+    instance_p->ignore___pipedes_in = true;
+    instance_p->params.return_value = return_value;
+    instance_p->errno_value = 0;
+    instance_p->next_p = NULL;
+
+    if (_narmock_state_for_pipe.instances.head_p == NULL) {
+        _narmock_state_for_pipe.instances.head_p = instance_p;
+    } else {
+        _narmock_state_for_pipe.instances.tail_p->next_p = instance_p;
+    }
+
+    _narmock_state_for_pipe.instances.tail_p = instance_p;
 
     return &_narmock_state_for_pipe.public;
 }
 
-static const _narmock_state_type_for_pipe *_narmock_mock_implementation_function_for_pipe(int (*implementation)(int arg1[2]))
+static const _narmock_state_type_for_pipe *_narmock_set_errno_function_for_pipe(int errno_value)
+{
+    if (_narmock_state_for_pipe.instances.tail_p == NULL) {
+        printf("No mock instance.\n");
+        exit(1);
+    }
+
+    _narmock_state_for_pipe.instances.tail_p->errno_value = errno_value;
+
+    return &_narmock_state_for_pipe.public;
+}
+
+
+static const _narmock_state_type_for_pipe *_narmock_set___pipedes_in_function_for_pipe(const void *buf_p, size_t size)
+{
+    if (_narmock_state_for_pipe.instances.tail_p == NULL) {
+        printf("No mock instance.\n");
+        exit(1);
+    }
+
+    _narmock_state_for_pipe.instances.tail_p->__pipedes_in.buf_p = xmalloc(size);
+    _narmock_state_for_pipe.instances.tail_p->__pipedes_in.size = size;
+    memcpy(_narmock_state_for_pipe.instances.tail_p->__pipedes_in.buf_p, buf_p, size);
+
+    return &_narmock_state_for_pipe.public;
+}
+
+static const _narmock_state_type_for_pipe *_narmock_set___pipedes_in_pointer_function_for_pipe(int __pipedes[2])
+{
+    if (_narmock_state_for_pipe.instances.tail_p == NULL) {
+        printf("No mock instance.\n");
+        exit(1);
+    }
+
+    _narmock_state_for_pipe.instances.tail_p->ignore___pipedes_in = false;
+    _narmock_state_for_pipe.instances.tail_p->params.__pipedes = __pipedes;
+
+    return &_narmock_state_for_pipe.public;
+}
+
+static const _narmock_state_type_for_pipe *_narmock_set___pipedes_out_function_for_pipe(const void *buf_p, size_t size)
+{
+    if (_narmock_state_for_pipe.instances.tail_p == NULL) {
+        printf("No mock instance.\n");
+        exit(1);
+    }
+
+    _narmock_state_for_pipe.instances.tail_p->__pipedes_out.buf_p = xmalloc(size);
+    _narmock_state_for_pipe.instances.tail_p->__pipedes_out.size = size;
+    memcpy(_narmock_state_for_pipe.instances.tail_p->__pipedes_out.buf_p, buf_p, size);
+
+    return &_narmock_state_for_pipe.public;
+}
+
+static const _narmock_state_type_for_pipe *_narmock_mock_none_function_for_pipe(void)
+{
+    _narmock_state_for_pipe.mode = 3;
+
+    return &_narmock_state_for_pipe.public;
+}
+
+static const _narmock_state_type_for_pipe *_narmock_mock_implementation_function_for_pipe(int (*implementation)(int __pipedes[2]))
 {
     _narmock_state_for_pipe.mode = 2;
     _narmock_state_for_pipe.implementation = implementation;
@@ -351,17 +640,9 @@ static const _narmock_state_type_for_pipe *_narmock_mock_implementation_function
     return &_narmock_state_for_pipe.public;
 }
 
-static const _narmock_state_type_for_pipe *_narmock_mock_errno_function_for_pipe(int errno_value)
-{
-    _narmock_state_for_pipe.errno_value = errno_value;
-
-    return &_narmock_state_for_pipe.public;
-}
-
 static const _narmock_state_type_for_pipe *_narmock_disable_mock_function_for_pipe(void)
 {
     _narmock_state_for_pipe.mode = 0;
-    _narmock_state_for_pipe.errno_value = 0;
 
     return &_narmock_state_for_pipe.public;
 }
@@ -369,9 +650,15 @@ static const _narmock_state_type_for_pipe *_narmock_disable_mock_function_for_pi
 static const _narmock_state_type_for_pipe *_narmock_reset_function_for_pipe(void)
 {
     _narmock_state_for_pipe.mode = 0;
-    _narmock_state_for_pipe.errno_value = 0;
-    _narmock_state_for_pipe.public.call_count = 0;
-    _narmock_state_for_pipe.public.last_call = NULL;
+    _narmock_state_for_pipe.instances.head_p = NULL;
+    _narmock_state_for_pipe.instances.tail_p = NULL;
+
+    return &_narmock_state_for_pipe.public;
+}
+
+static const _narmock_state_type_for_pipe *_narmock_assert_completed_function_for_pipe(void)
+{
+    assert(_narmock_state_for_pipe.instances.head_p == NULL);
 
     return &_narmock_state_for_pipe.public;
 }

@@ -23,24 +23,17 @@ void narmock_reset_all_mocks(void);
 // NARMOCK_LINKER_FLAGS -Wl,--wrap=close
 
 typedef struct _narmock_state_type_for_close _narmock_state_type_for_close;
-typedef struct _narmock_params_type_for_close _narmock_params_type_for_close;
 
 struct _narmock_state_type_for_close
 {
-    const _narmock_state_type_for_close *(*mock_return)(int return_value);
-    const _narmock_state_type_for_close *(*mock_implementation)(int (*implementation)(int arg1));
-    const _narmock_state_type_for_close *(*mock_errno)(int errno_value);
+    const _narmock_state_type_for_close *(*mock_once)(int __fd, int return_value);
+    const _narmock_state_type_for_close *(*set_errno)(int errno_value);
+    const _narmock_state_type_for_close *(*ignore___fd_in)(void);
+    const _narmock_state_type_for_close *(*mock_none)(void);
+    const _narmock_state_type_for_close *(*mock_implementation)(int (*implementation)(int __fd));
     const _narmock_state_type_for_close *(*disable_mock)(void);
     const _narmock_state_type_for_close *(*reset)(void);
-    int call_count;
-    const _narmock_params_type_for_close *last_call;
-};
-
-struct _narmock_params_type_for_close
-{
-    int arg1;
-    int return_value;
-    int errsv;
+    const _narmock_state_type_for_close *(*assert_completed)(void);
 };
 
 const _narmock_state_type_for_close *_narmock_get_mock_for_close(const void *function);
@@ -49,23 +42,16 @@ const _narmock_state_type_for_close *_narmock_get_mock_for_close(const void *fun
 // NARMOCK_LINKER_FLAGS -Wl,--wrap=fork
 
 typedef struct _narmock_state_type_for_fork _narmock_state_type_for_fork;
-typedef struct _narmock_params_type_for_fork _narmock_params_type_for_fork;
 
 struct _narmock_state_type_for_fork
 {
-    const _narmock_state_type_for_fork *(*mock_return)(__pid_t return_value);
+    const _narmock_state_type_for_fork *(*mock_once)(__pid_t return_value);
+    const _narmock_state_type_for_fork *(*set_errno)(int errno_value);
+    const _narmock_state_type_for_fork *(*mock_none)(void);
     const _narmock_state_type_for_fork *(*mock_implementation)(__pid_t (*implementation)(void));
-    const _narmock_state_type_for_fork *(*mock_errno)(int errno_value);
     const _narmock_state_type_for_fork *(*disable_mock)(void);
     const _narmock_state_type_for_fork *(*reset)(void);
-    int call_count;
-    const _narmock_params_type_for_fork *last_call;
-};
-
-struct _narmock_params_type_for_fork
-{
-    __pid_t return_value;
-    int errsv;
+    const _narmock_state_type_for_fork *(*assert_completed)(void);
 };
 
 const _narmock_state_type_for_fork *_narmock_get_mock_for_fork(const void *function);
@@ -74,24 +60,19 @@ const _narmock_state_type_for_fork *_narmock_get_mock_for_fork(const void *funct
 // NARMOCK_LINKER_FLAGS -Wl,--wrap=pipe
 
 typedef struct _narmock_state_type_for_pipe _narmock_state_type_for_pipe;
-typedef struct _narmock_params_type_for_pipe _narmock_params_type_for_pipe;
 
 struct _narmock_state_type_for_pipe
 {
-    const _narmock_state_type_for_pipe *(*mock_return)(int return_value);
-    const _narmock_state_type_for_pipe *(*mock_implementation)(int (*implementation)(int arg1[2]));
-    const _narmock_state_type_for_pipe *(*mock_errno)(int errno_value);
+    const _narmock_state_type_for_pipe *(*mock_once)(int return_value);
+    const _narmock_state_type_for_pipe *(*set_errno)(int errno_value);
+    const _narmock_state_type_for_pipe *(*set___pipedes_in)(const void *buf_p, size_t size);
+    const _narmock_state_type_for_pipe *(*set___pipedes_in_pointer)(int __pipedes[2]);
+    const _narmock_state_type_for_pipe *(*set___pipedes_out)(const void *buf_p, size_t size);
+    const _narmock_state_type_for_pipe *(*mock_none)(void);
+    const _narmock_state_type_for_pipe *(*mock_implementation)(int (*implementation)(int __pipedes[2]));
     const _narmock_state_type_for_pipe *(*disable_mock)(void);
     const _narmock_state_type_for_pipe *(*reset)(void);
-    int call_count;
-    const _narmock_params_type_for_pipe *last_call;
-};
-
-struct _narmock_params_type_for_pipe
-{
-    int *arg1;
-    int return_value;
-    int errsv;
+    const _narmock_state_type_for_pipe *(*assert_completed)(void);
 };
 
 const _narmock_state_type_for_pipe *_narmock_get_mock_for_pipe(const void *function);
