@@ -27,6 +27,7 @@
  */
 
 #include <sys/wait.h>
+#include <errno.h>
 #include "subprocess.h"
 #include "__mocks__.h"
 #include "narwhal.h"
@@ -113,4 +114,26 @@ TEST(test_completed_successfully_result_null)
     ASSERT_EQ(subprocess_completed_successfully(result_p), false);
 
     MOCK(fork)->assert_completed();
+}
+
+TEST(test_call_output_read_error)
+{
+    struct subprocess_result_t *result_p;
+
+    MOCK(read)
+        ->mock_once(0, 4095, -1)
+        ->ignore___fd_in()
+        ->set_errno(EINTR);
+    MOCK(read)
+        ->mock_once(0, 4095, 0)
+        ->ignore___fd_in();
+    MOCK(read)
+        ->mock_once(0, 4095, 0)
+        ->ignore___fd_in();
+
+    result_p = subprocess_call_output(call_no_output, NULL);
+
+    ASSERT_NE(result_p, NULL);
+
+    MOCK(read)->assert_completed();
 }

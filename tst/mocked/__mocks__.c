@@ -41,6 +41,7 @@ void narmock_reset_all_mocks(void)
     MOCK(close)->reset();
     MOCK(fork)->reset();
     MOCK(pipe)->reset();
+    MOCK(read)->reset();
 }
 
 // NARMOCK_IMPLEMENTATION close
@@ -668,4 +669,293 @@ const _narmock_state_type_for_pipe *_narmock_get_mock_for_pipe(const void *funct
     (void)function;
 
     return &_narmock_state_for_pipe.public;
+}
+
+// NARMOCK_IMPLEMENTATION read
+
+ssize_t __real_read(int __fd, void *__buf, size_t __nbytes);
+
+typedef struct _narmock_params_type_for_read _narmock_params_type_for_read;
+
+struct _narmock_params_type_for_read
+{
+    int __fd;
+    void *__buf;
+    size_t __nbytes;
+    ssize_t return_value;
+};
+
+typedef struct _narmock_instance_type_for_read _narmock_instance_type_for_read;
+
+struct _narmock_instance_type_for_read
+{
+    _narmock_params_type_for_read params;
+    bool ignore___fd_in;
+    bool ignore___buf_in;
+    _narmock_set_param __buf_in;
+    _narmock_set_param __buf_out;
+    bool ignore___nbytes_in;
+    int errno_value;
+    _narmock_instance_type_for_read *next_p;
+};
+
+typedef struct _narmock_instances_type_for_read _narmock_instances_type_for_read;
+
+struct _narmock_instances_type_for_read {
+    _narmock_instance_type_for_read *head_p;
+    _narmock_instance_type_for_read *tail_p;
+};
+
+typedef struct _narmock_private_state_type_for_read _narmock_private_state_type_for_read;
+
+struct _narmock_private_state_type_for_read
+{
+    _narmock_state_type_for_read public;
+    int mode;
+    _narmock_instances_type_for_read instances;
+    ssize_t (*implementation)(int __fd, void *__buf, size_t __nbytes);
+};
+
+static const _narmock_state_type_for_read *_narmock_mock_once_function_for_read(int __fd, size_t __nbytes, ssize_t return_value);
+static const _narmock_state_type_for_read *_narmock_set_errno_function_for_read(int errno_value);
+static const _narmock_state_type_for_read *_narmock_ignore___fd_in_function_for_read(void);
+static const _narmock_state_type_for_read *_narmock_ignore___nbytes_in_function_for_read(void);
+static const _narmock_state_type_for_read *_narmock_set___buf_in_function_for_read(const void *buf_p, size_t size);
+static const _narmock_state_type_for_read *_narmock_set___buf_in_pointer_function_for_read(void *__buf);
+static const _narmock_state_type_for_read *_narmock_set___buf_out_function_for_read(const void *buf_p, size_t size);
+static const _narmock_state_type_for_read *_narmock_mock_none_function_for_read(void);
+static const _narmock_state_type_for_read *_narmock_mock_implementation_function_for_read(ssize_t (*implementation)(int __fd, void *__buf, size_t __nbytes));
+static const _narmock_state_type_for_read *_narmock_disable_mock_function_for_read(void);
+static const _narmock_state_type_for_read *_narmock_reset_function_for_read(void);
+static const _narmock_state_type_for_read *_narmock_assert_completed_function_for_read(void);
+
+static _narmock_private_state_type_for_read _narmock_state_for_read =
+{
+    .public = {
+        .mock_once = _narmock_mock_once_function_for_read,
+        .set_errno = _narmock_set_errno_function_for_read,
+        .ignore___fd_in = _narmock_ignore___fd_in_function_for_read,
+        .ignore___nbytes_in = _narmock_ignore___nbytes_in_function_for_read,
+        .set___buf_in = _narmock_set___buf_in_function_for_read,
+        .set___buf_in_pointer = _narmock_set___buf_in_pointer_function_for_read,
+        .set___buf_out = _narmock_set___buf_out_function_for_read,
+        .mock_none = _narmock_mock_none_function_for_read,
+        .mock_implementation = _narmock_mock_implementation_function_for_read,
+        .disable_mock = _narmock_disable_mock_function_for_read,
+        .reset = _narmock_reset_function_for_read,
+        .assert_completed = _narmock_assert_completed_function_for_read
+    },
+    .mode = 0,
+    .instances = {
+        .head_p = NULL,
+        .tail_p = NULL
+    }
+};
+
+ssize_t __wrap_read(int __fd, void *__buf, size_t __nbytes)
+{
+    struct _narmock_instance_type_for_read *instance_p;
+    ssize_t return_value;
+
+    switch (_narmock_state_for_read.mode) {
+
+    case 1:
+        instance_p = _narmock_state_for_read.instances.head_p;
+
+        if (!instance_p->ignore___fd_in) {
+            assert(__fd == instance_p->params.__fd);
+        }
+        if (!instance_p->ignore___buf_in) {
+            assert(__buf == instance_p->params.__buf);
+        }
+        if (!instance_p->ignore___nbytes_in) {
+            assert(__nbytes == instance_p->params.__nbytes);
+        }
+
+        if (instance_p->__buf_out.buf_p != NULL) {
+            memcpy((void *)__buf, instance_p->__buf_out.buf_p, instance_p->__buf_out.size);
+            free(instance_p->__buf_out.buf_p);
+        }
+
+        if (instance_p->__buf_in.buf_p != NULL) {
+            assert(memcmp(__buf,
+                          instance_p->__buf_in.buf_p,
+                          instance_p->__buf_in.size) == 0);
+            free(instance_p->__buf_in.buf_p);
+        }
+
+        _narmock_state_for_read.instances.head_p = instance_p->next_p;
+        errno = instance_p->errno_value;
+        return_value = instance_p->params.return_value;
+        free(instance_p);
+        break;
+
+    case 2:
+        return_value =
+        _narmock_state_for_read.implementation(__fd, __buf, __nbytes);
+        break;
+
+    case 3:
+        assert(0);
+        break;
+
+    default:
+        return_value =
+        __real_read(__fd, __buf, __nbytes);
+        break;
+    }
+
+    return return_value;
+}
+
+static const _narmock_state_type_for_read *_narmock_mock_once_function_for_read(int __fd, size_t __nbytes, ssize_t return_value)
+{
+    struct _narmock_instance_type_for_read *instance_p;
+
+    _narmock_state_for_read.mode = 1;
+    instance_p = xmalloc(sizeof(*instance_p));
+    instance_p->__buf_out.buf_p = NULL;
+    instance_p->__buf_out.size = 0;
+    instance_p->__buf_in.buf_p = NULL;
+    instance_p->__buf_in.size = 0;
+    instance_p->params.__buf = NULL;
+    instance_p->ignore___buf_in = true;
+    instance_p->params.__fd = __fd;
+    instance_p->ignore___fd_in = false;
+    instance_p->params.__nbytes = __nbytes;
+    instance_p->ignore___nbytes_in = false;
+    instance_p->params.return_value = return_value;
+    instance_p->errno_value = 0;
+    instance_p->next_p = NULL;
+
+    if (_narmock_state_for_read.instances.head_p == NULL) {
+        _narmock_state_for_read.instances.head_p = instance_p;
+    } else {
+        _narmock_state_for_read.instances.tail_p->next_p = instance_p;
+    }
+
+    _narmock_state_for_read.instances.tail_p = instance_p;
+
+    return &_narmock_state_for_read.public;
+}
+
+static const _narmock_state_type_for_read *_narmock_set_errno_function_for_read(int errno_value)
+{
+    if (_narmock_state_for_read.instances.tail_p == NULL) {
+        printf("No mock instance.\n");
+        exit(1);
+    }
+
+    _narmock_state_for_read.instances.tail_p->errno_value = errno_value;
+
+    return &_narmock_state_for_read.public;
+}
+
+static const _narmock_state_type_for_read *_narmock_ignore___fd_in_function_for_read(void)
+{
+    if (_narmock_state_for_read.instances.tail_p == NULL) {
+        printf("No mock instance.\n");
+        exit(1);
+    }
+
+    _narmock_state_for_read.instances.tail_p->ignore___fd_in = true;
+
+    return &_narmock_state_for_read.public;
+}
+static const _narmock_state_type_for_read *_narmock_ignore___nbytes_in_function_for_read(void)
+{
+    if (_narmock_state_for_read.instances.tail_p == NULL) {
+        printf("No mock instance.\n");
+        exit(1);
+    }
+
+    _narmock_state_for_read.instances.tail_p->ignore___nbytes_in = true;
+
+    return &_narmock_state_for_read.public;
+}
+
+static const _narmock_state_type_for_read *_narmock_set___buf_in_function_for_read(const void *buf_p, size_t size)
+{
+    if (_narmock_state_for_read.instances.tail_p == NULL) {
+        printf("No mock instance.\n");
+        exit(1);
+    }
+
+    _narmock_state_for_read.instances.tail_p->__buf_in.buf_p = xmalloc(size);
+    _narmock_state_for_read.instances.tail_p->__buf_in.size = size;
+    memcpy(_narmock_state_for_read.instances.tail_p->__buf_in.buf_p, buf_p, size);
+
+    return &_narmock_state_for_read.public;
+}
+
+static const _narmock_state_type_for_read *_narmock_set___buf_in_pointer_function_for_read(void *__buf)
+{
+    if (_narmock_state_for_read.instances.tail_p == NULL) {
+        printf("No mock instance.\n");
+        exit(1);
+    }
+
+    _narmock_state_for_read.instances.tail_p->ignore___buf_in = false;
+    _narmock_state_for_read.instances.tail_p->params.__buf = __buf;
+
+    return &_narmock_state_for_read.public;
+}
+
+static const _narmock_state_type_for_read *_narmock_set___buf_out_function_for_read(const void *buf_p, size_t size)
+{
+    if (_narmock_state_for_read.instances.tail_p == NULL) {
+        printf("No mock instance.\n");
+        exit(1);
+    }
+
+    _narmock_state_for_read.instances.tail_p->__buf_out.buf_p = xmalloc(size);
+    _narmock_state_for_read.instances.tail_p->__buf_out.size = size;
+    memcpy(_narmock_state_for_read.instances.tail_p->__buf_out.buf_p, buf_p, size);
+
+    return &_narmock_state_for_read.public;
+}
+
+static const _narmock_state_type_for_read *_narmock_mock_none_function_for_read(void)
+{
+    _narmock_state_for_read.mode = 3;
+
+    return &_narmock_state_for_read.public;
+}
+
+static const _narmock_state_type_for_read *_narmock_mock_implementation_function_for_read(ssize_t (*implementation)(int __fd, void *__buf, size_t __nbytes))
+{
+    _narmock_state_for_read.mode = 2;
+    _narmock_state_for_read.implementation = implementation;
+
+    return &_narmock_state_for_read.public;
+}
+
+static const _narmock_state_type_for_read *_narmock_disable_mock_function_for_read(void)
+{
+    _narmock_state_for_read.mode = 0;
+
+    return &_narmock_state_for_read.public;
+}
+
+static const _narmock_state_type_for_read *_narmock_reset_function_for_read(void)
+{
+    _narmock_state_for_read.mode = 0;
+    _narmock_state_for_read.instances.head_p = NULL;
+    _narmock_state_for_read.instances.tail_p = NULL;
+
+    return &_narmock_state_for_read.public;
+}
+
+static const _narmock_state_type_for_read *_narmock_assert_completed_function_for_read(void)
+{
+    assert(_narmock_state_for_read.instances.head_p == NULL);
+
+    return &_narmock_state_for_read.public;
+}
+
+const _narmock_state_type_for_read *_narmock_get_mock_for_read(const void *function)
+{
+    (void)function;
+
+    return &_narmock_state_for_read.public;
 }

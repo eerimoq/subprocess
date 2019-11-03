@@ -81,8 +81,6 @@ static void output_append(struct subprocess_output_t *self_p, int fd)
             }
         }
     }
-
-    close(fd);
 }
 
 static void output_print(struct subprocess_output_t *self_p,

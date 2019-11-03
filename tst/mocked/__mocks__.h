@@ -77,4 +77,27 @@ struct _narmock_state_type_for_pipe
 
 const _narmock_state_type_for_pipe *_narmock_get_mock_for_pipe(const void *function);
 
+// NARMOCK_DECLARATION read
+// NARMOCK_LINKER_FLAGS -Wl,--wrap=read
+
+typedef struct _narmock_state_type_for_read _narmock_state_type_for_read;
+
+struct _narmock_state_type_for_read
+{
+    const _narmock_state_type_for_read *(*mock_once)(int __fd, size_t __nbytes, ssize_t return_value);
+    const _narmock_state_type_for_read *(*set_errno)(int errno_value);
+    const _narmock_state_type_for_read *(*ignore___fd_in)(void);
+    const _narmock_state_type_for_read *(*set___buf_in)(const void *buf_p, size_t size);
+    const _narmock_state_type_for_read *(*set___buf_in_pointer)(void *__buf);
+    const _narmock_state_type_for_read *(*set___buf_out)(const void *buf_p, size_t size);
+    const _narmock_state_type_for_read *(*ignore___nbytes_in)(void);
+    const _narmock_state_type_for_read *(*mock_none)(void);
+    const _narmock_state_type_for_read *(*mock_implementation)(ssize_t (*implementation)(int __fd, void *__buf, size_t __nbytes));
+    const _narmock_state_type_for_read *(*disable_mock)(void);
+    const _narmock_state_type_for_read *(*reset)(void);
+    const _narmock_state_type_for_read *(*assert_completed)(void);
+};
+
+const _narmock_state_type_for_read *_narmock_get_mock_for_read(const void *function);
+
 #endif
