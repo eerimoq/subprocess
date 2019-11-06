@@ -30,6 +30,7 @@
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/types.h>
 #include <sys/wait.h>
 #include "subprocess.h"
 
@@ -68,7 +69,7 @@ static void output_append(struct subprocess_output_t *self_p, int fd)
         if (res == 0) {
             break;
         } else if (res > 0) {
-            self_p->length += res;
+            self_p->length += (size_t)res;
             self_p->buf_p[self_p->length] = '\0';
 
             if ((self_p->length + 1) == self_p->size) {
