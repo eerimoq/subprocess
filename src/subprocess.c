@@ -116,6 +116,7 @@ static struct subprocess_result_t *result_new(void)
     }
 
     result_p->exit_code = -1;
+    result_p->signal_number = -1;
     res = output_init(&result_p->stdout);
 
     if (res != 0) {
@@ -157,6 +158,10 @@ static struct subprocess_result_t *call_parent(pid_t child_pid)
     if (result_p != NULL) {
         if (WIFEXITED(status)) {
             result_p->exit_code = WEXITSTATUS(status);
+        }
+
+        if (WIFSIGNALED(status)) {
+            result_p->signal_number = WTERMSIG(status);
         }
     }
 

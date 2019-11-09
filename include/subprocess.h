@@ -44,6 +44,7 @@ struct subprocess_output_t {
 
 struct subprocess_result_t {
     int exit_code;
+    int signal_number;
     struct subprocess_output_t stdout;
     struct subprocess_output_t stderr;
 };
