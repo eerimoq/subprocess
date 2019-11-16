@@ -27,7 +27,7 @@
  */
 
 #include "subprocess.h"
-#include "narwhal.h"
+#include "nala.h"
 
 static void call_no_output(void *arg_p)
 {
@@ -44,7 +44,7 @@ TEST(test_call)
     ASSERT_EQ(result_p->stdout.length, 0);
     ASSERT_EQ(result_p->stderr.length, 0);
 
-    CAPTURE_OUTPUT(output) {
+    CAPTURE_OUTPUT(output, errput) {
         subprocess_result_print(result_p);
     }
 
@@ -68,7 +68,7 @@ TEST(test_call_output_no_output)
     ASSERT_EQ(result_p->stdout.length, 0);
     ASSERT_EQ(result_p->stderr.length, 0);
 
-    CAPTURE_OUTPUT(output) {
+    CAPTURE_OUTPUT(output, errput) {
         subprocess_result_print(result_p);
     }
 
@@ -97,7 +97,7 @@ TEST(test_call_output_stdout)
     ASSERT_EQ(result_p->stdout.length, 6);
     ASSERT_EQ(result_p->stderr.length, 0);
 
-    CAPTURE_OUTPUT(output) {
+    CAPTURE_OUTPUT(output, errput) {
         subprocess_result_print(result_p);
     }
 
@@ -121,7 +121,7 @@ TEST(test_call_no_captured_stdout)
     ASSERT_EQ(result_p->stdout.length, 0);
     ASSERT_EQ(result_p->stderr.length, 0);
 
-    CAPTURE_OUTPUT(output) {
+    CAPTURE_OUTPUT(output, errput) {
         subprocess_result_print(result_p);
     }
 
@@ -150,7 +150,7 @@ TEST(test_call_output_stderr)
     ASSERT_EQ(result_p->stdout.length, 0);
     ASSERT_EQ(result_p->stderr.length, 6);
 
-    CAPTURE_OUTPUT(output) {
+    CAPTURE_OUTPUT(output, errput) {
         subprocess_result_print(result_p);
     }
 
@@ -176,7 +176,7 @@ TEST(test_call_output_exit)
 
     result_p = subprocess_call_output(call_exit, NULL);
 
-    CAPTURE_OUTPUT(output) {
+    CAPTURE_OUTPUT(output, errput) {
         subprocess_result_print(result_p);
     }
 
@@ -232,7 +232,7 @@ TEST(test_exec_no_captured_stdout)
     ASSERT_EQ(result_p->stdout.length, 0);
     ASSERT_EQ(result_p->stderr.length, 0);
 
-    CAPTURE_OUTPUT(output) {
+    CAPTURE_OUTPUT(output, errput) {
         subprocess_result_print(result_p);
     }
 
@@ -256,7 +256,7 @@ TEST(test_exec_output_stdout)
     ASSERT_EQ(result_p->stdout.length, 7);
     ASSERT_EQ(result_p->stderr.length, 0);
 
-    CAPTURE_OUTPUT(output) {
+    CAPTURE_OUTPUT(output, errput) {
         subprocess_result_print(result_p);
     }
 
@@ -294,7 +294,7 @@ TEST(test_exec_output_error_bad_command)
     ASSERT_EQ(result_p->stdout.length, 0);
     ASSERT_EQ(result_p->stderr.length, 46);
 
-    CAPTURE_OUTPUT(output) {
+    CAPTURE_OUTPUT(output, errput) {
         subprocess_result_print(result_p);
     }
 

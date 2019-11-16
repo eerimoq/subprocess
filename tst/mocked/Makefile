@@ -1,9 +1,6 @@
-CFLAGS += $(shell cat __mocks__.ld)
-SRC += \
-	__mocks__.c \
-	mock_libc.c \
-	mock.c
+CFLAGS += $(shell cat nala_mocks.ld)
+SRC += nala_mocks.c
 
-test: __mocks__.c
+test: nala_mocks.h
 
 include ../suite.mk

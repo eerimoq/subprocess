@@ -3,7 +3,7 @@ INC += \
 	../../include \
 	..
 SRC += \
-	../narwhal.c \
+	../nala.c \
 	../../src/subprocess.c \
 	main.c
 CFLAGS += \
@@ -13,13 +13,14 @@ CFLAGS += \
 	-Wall \
 	-fprofile-arcs \
 	-ftest-coverage \
+	-no-pie \
 	$(INC:%=-I%)
-NARMOCK ?= PYTHONPATH=/home/erik/workspace/narmock python3 -m narmock
+NALA ?= nala
 
 test:
 	$(CC) $(CFLAGS) $(SRC) -o main
 	./main
 
-__mocks__.c: main.c
-	$(CC) $(CFLAGS) -E main.c | $(NARMOCK) -g
-	$(NARMOCK) -f > __mocks__.ld
+nala_mocks.h: main.c
+	[ -f nala_mocks.h ] || touch nala_mocks.h
+	$(CC) $(INC:%=-I%) -E main.c | $(NALA) generate_mocks

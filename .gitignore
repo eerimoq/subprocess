@@ -55,4 +55,4 @@ examples/*/main
 *.gcno
 tst/normal/main
 tst/mocked/main
-tst/mocked/__mocks__.pp.c
+nala_mocks.*
