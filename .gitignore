@@ -56,3 +56,4 @@ examples/*/main
 tst/normal/main
 tst/mocked/main
 nala_mocks.*
+report.json

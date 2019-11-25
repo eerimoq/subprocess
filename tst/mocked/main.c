@@ -57,7 +57,7 @@ TEST(test_call_stderr_pipe_fail)
     int stdoutfds[2] = { 3, 4 };
 
     pipe_mock_once(0);
-    pipe_mock_set___pipedes_out(&stdoutfds[0], sizeof(stdoutfds));
+    pipe_mock_set_pipefd_out(&stdoutfds[0], sizeof(stdoutfds));
     pipe_mock_once(-1);
     fork_mock_none();
     close_mock_once(stdoutfds[0], 0);
@@ -75,9 +75,9 @@ TEST(test_call_fork_fail)
     int stderrfds[2] = { 5, 6 };
 
     pipe_mock_once(0);
-    pipe_mock_set___pipedes_out(&stdoutfds[0], sizeof(stdoutfds));
+    pipe_mock_set_pipefd_out(&stdoutfds[0], sizeof(stdoutfds));
     pipe_mock_once(0);
-    pipe_mock_set___pipedes_out(&stderrfds[0], sizeof(stderrfds));
+    pipe_mock_set_pipefd_out(&stderrfds[0], sizeof(stderrfds));
     fork_mock_once(-1);
     close_mock_once(stderrfds[0], 0);
     close_mock_once(stderrfds[1], 0);
