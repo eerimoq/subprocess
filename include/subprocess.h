@@ -26,10 +26,13 @@
  * This file is part of the subprocess project.
  */
 
+#ifndef SUBPROCESS_H
+#define SUBPROCESS_H
+
 #include <string.h>
 #include <stdbool.h>
 
-#define SUBPROCESS_VERSION "0.3.0"
+#define SUBPROCESS_VERSION "0.4.0"
 
 typedef void (*subprocess_entry_t)(void *arg_p);
 
@@ -93,3 +96,5 @@ void subprocess_result_print(struct subprocess_result_t *self_p);
  * Free given result.
  */
 void subprocess_result_free(struct subprocess_result_t *self_p);
+
+#endif
