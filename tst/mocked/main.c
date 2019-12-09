@@ -26,6 +26,7 @@
  * This file is part of the subprocess project.
  */
 
+#include <stdlib.h>
 #include <sys/types.h>
 #include <unistd.h>
 #include <sys/wait.h>
