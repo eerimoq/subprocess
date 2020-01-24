@@ -31,6 +31,7 @@
 #include <unistd.h>
 #include <sys/wait.h>
 #include <errno.h>
+#include <poll.h>
 #include "subprocess.h"
 #include "nala.h"
 #include "nala_mocks.h"
@@ -102,19 +103,30 @@ TEST(test_completed_successfully_result_null)
     ASSERT_EQ(subprocess_completed_successfully(result_p), false);
 }
 
-TEST(test_call_output_read_error)
+static void fds_out_copy(struct pollfd *fds, const void *nala_buf_p, size_t nala_size)
+{
+    const struct pollfd *fds_p;
+
+    fds_p = nala_buf_p;
+    fds[0].revents = fds_p[0].revents;
+    fds[1].revents = fds_p[1].revents;
+}
+
+TEST(test_call_output_poll_error)
 {
     struct subprocess_result_t *result_p;
+    struct pollfd fds[2];
 
-    read_mock_once(0, 4095, -1);
-    read_mock_ignore_fd_in();
-    read_mock_set_errno(EINTR);
-    read_mock_once(0, 4095, 0);
-    read_mock_ignore_fd_in();
-    read_mock_once(0, 4095, 0);
-    read_mock_ignore_fd_in();
+    poll_mock_once(2, -1, -1);
+    poll_mock_set_errno(EINTR);
+    poll_mock_once(2, -1, 2);
+    fds[0].revents = POLLHUP;
+    fds[1].revents = POLLHUP;
+    poll_mock_set_fds_out(&fds[0], sizeof(fds));
+    poll_mock_set_fds_out_copy(fds_out_copy);
 
     result_p = subprocess_call_output(call_no_output, NULL);
 
     ASSERT_NE(result_p, NULL);
+    ASSERT_EQ(result_p->exit_code, 0);
 }

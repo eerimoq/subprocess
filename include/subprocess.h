@@ -32,7 +32,7 @@
 #include <string.h>
 #include <stdbool.h>
 
-#define SUBPROCESS_VERSION "0.4.0"
+#define SUBPROCESS_VERSION "0.5.0"
 
 typedef void (*subprocess_entry_t)(void *arg_p);
 

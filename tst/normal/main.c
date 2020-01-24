@@ -191,11 +191,14 @@ TEST(test_call_output_exit)
               "\n");
 }
 
+/**
+ * Hopefully big enough to fill the output pipes.
+ */
 static void call_long_output(void *arg_p)
 {
     int i;
 
-    for (i = 0; i < 2000; i++) {
+    for (i = 0; i < 200000; i++) {
         printf("123");
         fprintf(stderr, "456");
     }
@@ -208,10 +211,10 @@ TEST(test_call_output_long_output)
 
     result_p = subprocess_call_output(call_long_output, NULL);
 
-    ASSERT_EQ(result_p->stdout.length, 6000);
-    ASSERT_EQ(result_p->stderr.length, 6000);
+    ASSERT_EQ(result_p->stdout.length, 600000);
+    ASSERT_EQ(result_p->stderr.length, 600000);
 
-    for (i = 0; i < 2000; i++) {
+    for (i = 0; i < 200000; i++) {
         ASSERT_EQ(result_p->stdout.buf_p[3 * i + 0], '1');
         ASSERT_EQ(result_p->stdout.buf_p[3 * i + 1], '2');
         ASSERT_EQ(result_p->stdout.buf_p[3 * i + 2], '3');
