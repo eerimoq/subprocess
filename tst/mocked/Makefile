@@ -1,4 +1,4 @@
-CFLAGS += $(shell cat nala_mocks.ld)
+CFLAGS += $(shell cat nala_mocks.ldflags)
 SRC += nala_mocks.c
 
 test: nala_mocks.h
