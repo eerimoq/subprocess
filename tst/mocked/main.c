@@ -103,13 +103,10 @@ TEST(test_completed_successfully_result_null)
     ASSERT_EQ(subprocess_completed_successfully(result_p), false);
 }
 
-static void fds_out_copy(struct pollfd *fds, const void *nala_buf_p, size_t nala_size)
+static void fds_out_copy(struct pollfd *dst_p, struct pollfd *src_p, size_t nala_size)
 {
-    const struct pollfd *fds_p;
-
-    fds_p = nala_buf_p;
-    fds[0].revents = fds_p[0].revents;
-    fds[1].revents = fds_p[1].revents;
+    dst_p[0].revents = src_p[0].revents;
+    dst_p[1].revents = src_p[1].revents;
 }
 
 TEST(test_call_output_poll_error)

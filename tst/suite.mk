@@ -1,9 +1,9 @@
 INC += \
 	. \
 	../../include \
-	..
+	$(shell $(NALA) include_dir)
 SRC += \
-	../nala.c \
+	$(shell $(NALA) c_sources) \
 	../../src/subprocess.c \
 	main.c
 CFLAGS += \
