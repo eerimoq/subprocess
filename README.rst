@@ -1,5 +1,6 @@
 |buildstatus|_
 |codecov|_
+|nala|_
 
 About
 =====
@@ -17,6 +18,9 @@ See `examples`_ for examples.
 
 .. |codecov| image:: https://codecov.io/gh/eerimoq/subprocess/branch/master/graph/badge.svg
 .. _codecov: https://codecov.io/gh/eerimoq/subprocess
+
+.. |nala| image:: https://img.shields.io/badge/nala-test-blue.svg
+.. _nala: https://github.com/eerimoq/nala
 
 .. _subprocess.h: https://github.com/eerimoq/subprocess/blob/master/include/subprocess.h
 
